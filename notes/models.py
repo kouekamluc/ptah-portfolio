@@ -74,6 +74,11 @@ class Note(models.Model):
         default=False,
         help_text="Feature on homepage latest notes section"
     )
+    seo_description = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Custom meta description for search engines"
+    )
     published_at = models.DateTimeField(
         default=timezone.now,
         help_text="Publication timestamp"
@@ -85,6 +90,34 @@ class Note(models.Model):
         verbose_name = "Engineering Note"
         verbose_name_plural = "Engineering Notes"
         ordering = ["-published_at", "-created_at"]
+
+    @property
+    def content(self):
+        return self.content_markdown
+
+    @content.setter
+    def content(self, value):
+        self.content_markdown = value
+
+    @property
+    def published(self):
+        return self.is_published
+
+    @published.setter
+    def published(self, value):
+        self.is_published = value
+
+    @property
+    def featured(self):
+        return self.is_featured
+
+    @featured.setter
+    def featured(self, value):
+        self.is_featured = value
+
+    @property
+    def meta_description(self):
+        return self.seo_description or self.excerpt[:160]
 
     def save(self, *args, **kwargs):
         if not self.slug:

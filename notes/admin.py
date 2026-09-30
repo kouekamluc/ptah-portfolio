@@ -47,6 +47,7 @@ class NoteAdmin(admin.ModelAdmin):
         ("Abstract & Cover", {
             "fields": (
                 "excerpt",
+                "seo_description",
                 "cover_image",
             )
         }),
@@ -65,6 +66,9 @@ class NoteAdmin(admin.ModelAdmin):
 
     def preview_cover(self, obj):
         if obj.cover_image:
-            return format_html('<img src="{}" style="height: 36px; border-radius: 4px;" />', obj.cover_image.url)
+            try:
+                return format_html('<img src="{}" style="height: 36px; border-radius: 4px;" />', obj.cover_image.url)
+            except ValueError:
+                return "-"
         return "-"
     preview_cover.short_description = "Cover"

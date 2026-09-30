@@ -33,6 +33,10 @@ class NoteListView(ListView):
         if tag:
             qs = qs.filter(tags__icontains=tag)
 
+        featured = self.request.GET.get("featured", "").strip().lower()
+        if featured in ["1", "true", "yes"]:
+            qs = qs.filter(is_featured=True)
+
         return qs.order_by("-published_at")
 
     def get_context_data(self, **kwargs):
@@ -41,6 +45,11 @@ class NoteListView(ListView):
         context["current_category"] = self.request.GET.get("category", "")
         context["current_tag"] = self.request.GET.get("tag", "")
         context["search_query"] = self.request.GET.get("q", "")
+        context["featured_filter"] = self.request.GET.get("featured", "")
+        context["featured_notes"] = (
+            Note.objects.filter(is_published=True, is_featured=True)
+            .select_related("category")[:3]
+        )
         return context
 
 
