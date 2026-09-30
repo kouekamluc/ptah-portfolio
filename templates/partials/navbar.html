@@ -94,6 +94,8 @@
         <button
           type="button"
           aria-label="Open mobile menu"
+          :aria-expanded="mobileMenuOpen.toString()"
+          aria-controls="mobile-navigation-menu"
           @click="mobileMenuOpen = !mobileMenuOpen"
           class="md:hidden p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors"
         >
@@ -109,6 +111,7 @@
 
   <!-- Mobile Drawer Menu (Accessible Alpine.js) -->
   <div 
+    id="mobile-navigation-menu"
     x-show="mobileMenuOpen" 
     x-transition:enter="transition ease-out duration-150"
     x-transition:enter-start="opacity-0 -translate-y-2"

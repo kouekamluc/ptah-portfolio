@@ -584,3 +584,29 @@ class CoreViewTests(TestCase):
         self.assertContains(res_about, "KKEVO Media Platform")
         self.assertNotContains(res_about, "Archived Lab Initiative")
 
+    def test_accessibility_conformance(self):
+        pages = [
+            reverse("core:home"),
+            reverse("core:about"),
+            reverse("core:stack"),
+            reverse("projects:list"),
+            reverse("projects:engineering"),
+            reverse("notes:list"),
+            reverse("contact:index"),
+            reverse("core:search"),
+        ]
+        for url in pages:
+            res = self.client.get(url)
+            self.assertEqual(res.status_code, 200)
+            content = res.content.decode("utf-8")
+            # 1. Skip link exists
+            self.assertIn("Skip to main content", content)
+            # 2. Main landmark exists
+            self.assertIn('id="main-content"', content)
+            # 3. Exactly one <h1> tag
+            h1_count = content.count("<h1")
+            self.assertEqual(h1_count, 1, f"Expected 1 <h1> on {url}, found {h1_count}")
+            # 4. Command palette dialog accessibility
+            self.assertIn('role="dialog"', content)
+            self.assertIn('aria-modal="true"', content)
+
