@@ -52,7 +52,11 @@ class HomeView(TemplateView):
             .order_by("-published_at")[:3]
         )
         context["project_categories"] = ProjectCategory.objects.all().order_by("display_order")
-        context["organizations"] = Organization.objects.filter(is_active=True).order_by("display_order")
+        context["organizations"] = (
+            Organization.objects.filter(is_active=True)
+            .prefetch_related("associated_projects")
+            .order_by("display_order")
+        )
         return context
 
 
@@ -63,7 +67,11 @@ class AboutView(TemplateView):
         context = super().get_context_data(**kwargs)
         context["educations"] = Education.objects.all().order_by("display_order", "-start_date")
         context["timeline_items"] = TimelineItem.objects.all().order_by("display_order", "-start_date")
-        context["organizations"] = Organization.objects.filter(is_active=True).order_by("display_order")
+        context["organizations"] = (
+            Organization.objects.filter(is_active=True)
+            .prefetch_related("associated_projects")
+            .order_by("display_order")
+        )
         return context
 
 
