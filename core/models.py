@@ -19,6 +19,7 @@ class SiteSettings(models.Model):
         help_text="Concise professional positioning (e.g. 'Engineer. Developer. Builder.')"
     )
     short_bio = models.TextField(
+        blank=True,
         default=(
             "Engineering student studying Mechatronics Engineering and Engineering Science in Italy. "
             "Building at the intersection of embedded electronics, mechanical systems, and robust software."
@@ -31,6 +32,7 @@ class SiteSettings(models.Model):
     )
     location = models.CharField(
         max_length=150,
+        blank=True,
         default="Italy",
         help_text="General location (country/city)"
     )
@@ -49,6 +51,7 @@ class SiteSettings(models.Model):
         max_length=30,
         choices=STATUS_CHOICES,
         default="collab",
+        blank=True,
         help_text="Current professional availability indicator"
     )
     
@@ -92,8 +95,25 @@ class SiteSettings(models.Model):
         null=True,
         help_text="Social preview image (1200x630px recommended)"
     )
+    default_meta_description = models.TextField(
+        blank=True,
+        default="Personal engineering and software portfolio of Ptah Kouekam Kamgou Luc Kevin - Engineer. Developer. Builder.",
+        help_text="Default SEO meta description for pages without custom descriptions"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    @property
+    def profile_image(self):
+        return self.profile_photo
+
+    @property
+    def default_social_image(self):
+        return self.opengraph_image
+
+    @property
+    def resume(self):
+        return self.resume_file
 
     class Meta:
         verbose_name = "Site Settings"

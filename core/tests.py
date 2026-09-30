@@ -14,6 +14,19 @@ class CoreModelTests(TestCase):
         with self.assertRaises(ValidationError):
             second_settings.clean()
 
+    def test_site_settings_property_aliases(self):
+        settings = SiteSettings.get_settings()
+        self.assertEqual(settings.profile_image, settings.profile_photo)
+        self.assertEqual(settings.default_social_image, settings.opengraph_image)
+        self.assertEqual(settings.resume, settings.resume_file)
+
+    def test_site_settings_default_meta_description(self):
+        settings = SiteSettings.get_settings()
+        settings.default_meta_description = "Engineered systems and mechatronics portfolio."
+        settings.save()
+        fresh = SiteSettings.get_settings()
+        self.assertEqual(fresh.default_meta_description, "Engineered systems and mechatronics portfolio.")
+
     def test_technology_and_category(self):
         cat = TechnologyCategory.objects.create(name="Embedded Hardware", display_order=1)
         tech = Technology.objects.create(
@@ -33,11 +46,43 @@ class CoreViewTests(TestCase):
         self.cat = TechnologyCategory.objects.create(name="Software", display_order=1)
         self.tech = Technology.objects.create(category=self.cat, name="Django", highlighted=True)
 
+    def test_global_context_processor_availability(self):
+        response = self.client.get(reverse("core:home"))
+        self.assertIn("site_settings", response.context)
+        self.assertIn("global_socials", response.context)
+        self.assertIn("global_hero_socials", response.context)
+        self.assertIn("global_nav_socials", response.context)
+        self.assertIn("global_footer_socials", response.context)
+        self.assertIn("global_currently_building", response.context)
+        self.assertIn("current_year", response.context)
+
     def test_home_page(self):
         response = self.client.get(reverse("core:home"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Ptah Kouekam")
         self.assertContains(response, "Engineer. Developer. Builder.")
+
+    def test_home_page_with_meta_description(self):
+        self.settings.default_meta_description = "Unique engineer portfolio meta description test"
+        self.settings.save()
+        response = self.client.get(reverse("core:home"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Unique engineer portfolio meta description test")
+
+    def test_home_page_when_optional_fields_missing(self):
+        self.settings.public_email = ""
+        self.settings.location = ""
+        self.settings.short_bio = ""
+        self.settings.long_bio = ""
+        self.settings.availability_status = ""
+        self.settings.default_meta_description = ""
+        self.settings.profile_photo = None
+        self.settings.resume_file = None
+        self.settings.save()
+        response = self.client.get(reverse("core:home"))
+        self.assertEqual(response.status_code, 200)
+        # Check that page still renders gracefully
+        self.assertContains(response, "Ptah Kouekam")
 
     def test_about_page(self):
         response = self.client.get(reverse("core:about"))

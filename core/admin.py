@@ -41,6 +41,7 @@ class SiteSettingsAdmin(admin.ModelAdmin):
         }),
         ("SEO & Footer", {
             "fields": (
+                "default_meta_description",
                 "seo_meta_keywords",
                 "footer_text",
             )
