@@ -18,11 +18,10 @@
       Based in {{ site_settings.location }} &bull; Mechatronics Engineering / Engineering Science
     </p>
 
-    {% if site_settings.resume_file %}
+    {% if site_settings.resume %}
       <div class="mt-6">
         <a 
-          href="{{ site_settings.resume_file.url }}" 
-          download
+          href="{% url 'core:cv_download' %}" 
           class="inline-flex items-center px-4 py-2 rounded-lg bg-slate-900 dark:bg-cyan-500 hover:bg-slate-800 dark:hover:bg-cyan-400 text-white dark:text-slate-950 font-medium text-xs font-mono transition-colors shadow"
         >
           <svg class="mr-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -157,6 +156,7 @@
     </section>
 
     <!-- Academic Studies in Italy -->
+    {% if educations %}
     <section class="border-t border-slate-200 dark:border-slate-800 pt-10">
       <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-6">
         Academic Engineering Studies
@@ -201,8 +201,10 @@
         {% endfor %}
       </div>
     </section>
+    {% endif %}
 
     <!-- Professional & Project Timeline -->
+    {% if timeline_items %}
     <section class="border-t border-slate-200 dark:border-slate-800 pt-10">
       <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-6">
         Milestone Chronology & Experience
@@ -236,6 +238,7 @@
         {% endfor %}
       </div>
     </section>
+    {% endif %}
 
     <!-- Initiatives & Affiliations -->
     {% if organizations %}

@@ -93,7 +93,8 @@ class CoreViewTests(TestCase):
     def test_about_page(self):
         response = self.client.get(reverse("core:about"))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Academic Engineering Studies")
+        self.assertContains(response, "Ptah Kouekam")
+        self.assertContains(response, "Who I Am")
 
     def test_stack_page(self):
         # Create an inactive technology
@@ -318,13 +319,59 @@ class CoreViewTests(TestCase):
         edu = Education.objects.create(
             degree="B.Sc. Mechatronics",
             institution="Polytechnic in Italy",
-            start_date=datetime.date(2023, 10, 1)
+            start_date=datetime.date(2023, 10, 1),
+            is_current=True,
+            coursework="Dynamics, Control, Circuits"
         )
         self.assertEqual(str(edu), "B.Sc. Mechatronics - Polytechnic in Italy")
+        self.assertEqual(edu.program, "B.Sc. Mechatronics")
+        self.assertTrue(edu.currently_enrolled)
+        self.assertEqual(edu.relevant_coursework, "Dynamics, Control, Circuits")
 
         tl = TimelineItem.objects.create(
             title="Firmware Milestone",
             organization="Lab",
+            item_type="milestone",
+            is_current=True,
             start_date=datetime.date(2024, 3, 1)
         )
         self.assertEqual(str(tl), "Firmware Milestone @ Lab")
+        self.assertEqual(tl.type, "milestone")
+        self.assertTrue(tl.current)
+
+    def test_about_page_detailed(self):
+        import datetime
+        Education.objects.all().delete()
+        TimelineItem.objects.all().delete()
+
+        # Test empty state for optional sections
+        response = self.client.get(reverse("core:about"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Understand &rarr; Model &rarr; Build &rarr; Measure &rarr; Improve")
+        self.assertNotContains(response, "Academic Engineering Studies")
+        self.assertNotContains(response, "Milestone Chronology & Experience")
+
+        # Now create an active education and completed timeline item
+        edu = Education.objects.create(
+            degree="B.Sc. Engineering Science",
+            institution="Italian University",
+            start_date=datetime.date(2023, 9, 1),
+            is_current=True
+        )
+        tl = TimelineItem.objects.create(
+            title="Embedded Robotics Project",
+            organization="Independent Research",
+            item_type="project",
+            start_date=datetime.date(2024, 1, 1),
+            end_date=datetime.date(2024, 6, 1),
+            is_current=False
+        )
+
+        response = self.client.get(reverse("core:about"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Academic Engineering Studies")
+        self.assertContains(response, "B.Sc. Engineering Science")
+        self.assertContains(response, "Present")
+        self.assertContains(response, "Milestone Chronology & Experience")
+        self.assertContains(response, "Embedded Robotics Project")
+

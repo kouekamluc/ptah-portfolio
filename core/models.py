@@ -289,14 +289,15 @@ class CurrentlyBuilding(models.Model):
 
 
 class TimelineItem(models.Model):
-    """Unified chronological record: Education, Experience, Milestones, Certifications."""
+    """Unified chronological record: Education, Work, Project, Milestone, Organization, Certification, Achievement."""
     TYPE_CHOICES = [
         ("education", "Education"),
-        ("experience", "Experience / Roles"),
+        ("work", "Work / Experience"),
+        ("project", "Project"),
         ("milestone", "Milestone"),
-        ("achievement", "Achievement / Award"),
+        ("organization", "Organization"),
         ("certification", "Certification"),
-        ("initiative", "Organization / Project"),
+        ("achievement", "Achievement"),
     ]
 
     title = models.CharField(max_length=200, help_text="Degree, role, or milestone title")
@@ -306,7 +307,7 @@ class TimelineItem(models.Model):
     end_date = models.DateField(blank=True, null=True, help_text="Leave blank if currently ongoing")
     is_current = models.BooleanField(default=False)
     description = models.TextField(blank=True)
-    item_type = models.CharField(max_length=20, choices=TYPE_CHOICES, default="experience")
+    item_type = models.CharField(max_length=20, choices=TYPE_CHOICES, default="work")
     url = models.URLField(blank=True)
     display_order = models.PositiveIntegerField(default=0)
 
@@ -314,6 +315,22 @@ class TimelineItem(models.Model):
         verbose_name = "Timeline Item"
         verbose_name_plural = "Timeline Items"
         ordering = ["-is_current", "-start_date", "display_order"]
+
+    @property
+    def current(self):
+        return self.is_current
+
+    @current.setter
+    def current(self, value):
+        self.is_current = value
+
+    @property
+    def type(self):
+        return self.item_type
+
+    @type.setter
+    def type(self, value):
+        self.item_type = value
 
     def __str__(self):
         return f"{self.title} @ {self.organization}"
@@ -348,6 +365,30 @@ class Education(models.Model):
         verbose_name = "Education Record"
         verbose_name_plural = "Education Records"
         ordering = ["display_order", "-start_date"]
+
+    @property
+    def program(self):
+        return self.degree
+
+    @program.setter
+    def program(self, value):
+        self.degree = value
+
+    @property
+    def currently_enrolled(self):
+        return self.is_current
+
+    @currently_enrolled.setter
+    def currently_enrolled(self, value):
+        self.is_current = value
+
+    @property
+    def relevant_coursework(self):
+        return self.coursework
+
+    @relevant_coursework.setter
+    def relevant_coursework(self, value):
+        self.coursework = value
 
     def __str__(self):
         return f"{self.degree} - {self.institution}"
