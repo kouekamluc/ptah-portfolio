@@ -1,19 +1,36 @@
 <div class="group flex flex-col rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0c1220] hover:border-cyan-500/50 dark:hover:border-cyan-500/50 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
   
-  <!-- Card Header & Status -->
+  <!-- Thumbnail (if uploaded) -->
+  {% if project.thumbnail %}
+    <a href="{{ project.get_absolute_url }}" class="aspect-video w-full overflow-hidden bg-slate-100 dark:bg-slate-800 block border-b border-slate-100 dark:border-slate-800/80">
+      <img 
+        src="{{ project.thumbnail.url }}" 
+        alt="{{ project.title }}" 
+        loading="lazy" 
+        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+      >
+    </a>
+  {% endif %}
+
+  <!-- Card Body -->
   <div class="p-6 flex-1 flex flex-col justify-between">
     <div>
-      <div class="flex items-center justify-between gap-2 mb-3">
-        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-mono font-medium {% if project.is_hardware_project %}bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20{% else %}bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 border border-cyan-500/20{% endif %}">
-          {{ project.get_project_type_display }}
-        </span>
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <div class="flex items-center space-x-1.5 flex-wrap gap-1">
+          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-mono font-medium {% if project.is_hardware_project %}bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20{% else %}bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 border border-cyan-500/20{% endif %}">
+            {{ project.get_project_type_display }}
+          </span>
+          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-mono bg-slate-100 dark:bg-slate-800/90 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+            {{ project.get_status_display }}
+          </span>
+        </div>
         <span class="text-xs font-mono text-slate-400 dark:text-slate-500">
           {{ project.year_display }}
         </span>
       </div>
 
       <h3 class="text-lg font-semibold text-slate-900 dark:text-white group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors leading-snug">
-        <a href="{{ project.get_absolute_url }}">
+        <a href="{{ project.get_absolute_url }}" class="focus:outline-none focus:underline">
           {{ project.title }}
         </a>
       </h3>

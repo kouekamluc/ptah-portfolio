@@ -25,10 +25,11 @@
       hx-target="#project-grid"
       hx-trigger="change, keyup delay:250ms from:#project-search"
       hx-push-url="true"
-      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3"
+      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3"
     >
       <!-- Search -->
       <div class="relative">
+        <label for="project-search" class="sr-only">Search projects</label>
         <input 
           id="project-search"
           type="text" 
@@ -44,7 +45,9 @@
 
       <!-- Domain Category Filter -->
       <div>
+        <label for="category-select" class="sr-only">Category</label>
         <select 
+          id="category-select"
           name="category"
           class="w-full py-2 px-3 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-500"
         >
@@ -57,9 +60,28 @@
         </select>
       </div>
 
+      <!-- Status Filter -->
+      <div>
+        <label for="status-select" class="sr-only">Status</label>
+        <select 
+          id="status-select"
+          name="status"
+          class="w-full py-2 px-3 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+        >
+          <option value="">All Statuses</option>
+          {% for status_key, status_label in statuses %}
+            <option value="{{ status_key }}" {% if current_status == status_key %}selected{% endif %}>
+              {{ status_label }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
       <!-- Project Type Filter -->
       <div>
+        <label for="type-select" class="sr-only">Project Type</label>
         <select 
+          id="type-select"
           name="type"
           class="w-full py-2 px-3 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-500"
         >
@@ -74,13 +96,15 @@
 
       <!-- Technology Filter -->
       <div>
+        <label for="tech-select" class="sr-only">Technology</label>
         <select 
+          id="tech-select"
           name="tech"
           class="w-full py-2 px-3 text-xs rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-500"
         >
           <option value="">All Technologies</option>
           {% for tech in technologies %}
-            <option value="{{ tech.slug }}" {% if current_tech == tech.slug %}selected{% endif %}>
+            <option value="{{ tech.slug }}" {% if current_tech == tech.slug or current_tech == tech.name %}selected{% endif %}>
               {{ tech.name }}
             </option>
           {% endfor %}

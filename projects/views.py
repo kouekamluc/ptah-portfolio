@@ -28,30 +28,38 @@ class ProjectListView(ListView):
                 Q(technologies__name__icontains=query)
             ).distinct()
 
-        # Category filter
+        # Category filter (?category=embedded)
         cat_slug = self.request.GET.get("category", "").strip()
         if cat_slug:
             qs = qs.filter(category__slug=cat_slug)
+
+        # Status filter (?status=completed)
+        status_val = self.request.GET.get("status", "").strip()
+        if status_val:
+            qs = qs.filter(status=status_val)
 
         # Project Type filter
         p_type = self.request.GET.get("type", "").strip()
         if p_type:
             qs = qs.filter(project_type=p_type)
 
-        # Technology filter
-        tech_slug = self.request.GET.get("tech", "").strip()
-        if tech_slug:
-            qs = qs.filter(technologies__slug=tech_slug)
+        # Technology filter (?technology=django or ?tech=django)
+        tech_val = (self.request.GET.get("technology", "") or self.request.GET.get("tech", "")).strip()
+        if tech_val:
+            qs = qs.filter(Q(technologies__slug=tech_val) | Q(technologies__name__iexact=tech_val)).distinct()
 
-        return qs.order_by("display_order", "-start_date")
+        # Featured first, then deliberate display_order, then most recent start date
+        return qs.order_by("-is_featured", "display_order", "-start_date")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["categories"] = ProjectCategory.objects.all().order_by("display_order")
         context["technologies"] = Technology.objects.filter(projects__isnull=False).distinct().order_by("name")
+        context["statuses"] = Project.STATUS_CHOICES
         context["current_category"] = self.request.GET.get("category", "")
+        context["current_status"] = self.request.GET.get("status", "")
         context["current_type"] = self.request.GET.get("type", "")
-        context["current_tech"] = self.request.GET.get("tech", "")
+        context["current_tech"] = self.request.GET.get("technology", "") or self.request.GET.get("tech", "")
         context["search_query"] = self.request.GET.get("q", "")
         context["project_types"] = Project.TYPE_CHOICES
         return context

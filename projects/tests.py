@@ -153,3 +153,74 @@ class ProjectModelAndViewsTests(TestCase):
         response_empty = self.client.get(reverse("projects:list"), {"category": "non-existent-cat"})
         self.assertEqual(response_empty.status_code, 200)
         self.assertNotContains(response_empty, "Balancing Robot")
+
+    def test_project_status_filtering(self):
+        # self.project status is 'prototype'
+        res_match = self.client.get(reverse("projects:list"), {"status": "prototype"})
+        self.assertEqual(res_match.status_code, 200)
+        self.assertContains(res_match, "Balancing Robot")
+
+        res_nomatch = self.client.get(reverse("projects:list"), {"status": "completed"})
+        self.assertEqual(res_nomatch.status_code, 200)
+        self.assertNotContains(res_nomatch, "Balancing Robot")
+
+    def test_project_technology_filtering(self):
+        # self.project has tech "Arduino" (slug: "arduino")
+        res_tech = self.client.get(reverse("projects:list"), {"technology": "arduino"})
+        self.assertEqual(res_tech.status_code, 200)
+        self.assertContains(res_tech, "Balancing Robot")
+
+        res_tech_short = self.client.get(reverse("projects:list"), {"tech": "arduino"})
+        self.assertEqual(res_tech_short.status_code, 200)
+        self.assertContains(res_tech_short, "Balancing Robot")
+
+    def test_project_pagination(self):
+        # Create additional projects to exceed paginate_by = 9
+        for i in range(12):
+            Project.objects.create(
+                title=f"Batch Project {i}",
+                tagline=f"Tagline {i}",
+                project_type="software",
+                category=self.cat,
+                status="completed",
+                start_date=datetime.date(2024, 1, 1),
+                overview="Overview"
+            )
+        response = self.client.get(reverse("projects:list"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context["is_paginated"])
+        self.assertEqual(len(response.context["projects"]), 9)
+        # Check page 2
+        response_p2 = self.client.get(reverse("projects:list"), {"page": 2})
+        self.assertEqual(response_p2.status_code, 200)
+        self.assertEqual(len(response_p2.context["projects"]), 4)
+
+    def test_project_list_ordering_featured_first(self):
+        Project.objects.all().delete()
+        p_normal = Project.objects.create(
+            title="Normal Project",
+            tagline="Normal",
+            project_type="software",
+            category=self.cat,
+            status="completed",
+            start_date=datetime.date(2025, 1, 1),
+            is_featured=False,
+            display_order=1,
+            overview="Normal"
+        )
+        p_featured = Project.objects.create(
+            title="Featured Project",
+            tagline="Featured",
+            project_type="software",
+            category=self.cat,
+            status="completed",
+            start_date=datetime.date(2023, 1, 1),
+            is_featured=True,
+            display_order=5,
+            overview="Featured"
+        )
+        response = self.client.get(reverse("projects:list"))
+        self.assertEqual(response.status_code, 200)
+        projects = list(response.context["projects"])
+        self.assertEqual(projects[0], p_featured)
+        self.assertEqual(projects[1], p_normal)
