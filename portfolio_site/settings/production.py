@@ -34,6 +34,12 @@ SECURE_HSTS_PRELOAD = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin"
 
+# Persistent Media Volume Support (for Railway persistent volume mounts)
+RAILWAY_VOLUME_MOUNT_PATH = env("RAILWAY_VOLUME_MOUNT_PATH", default="")
+if RAILWAY_VOLUME_MOUNT_PATH:
+    MEDIA_ROOT = Path(RAILWAY_VOLUME_MOUNT_PATH) / "media"
+    MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
+
 # Production Logging Configuration
 LOGGING = {
     "version": 1,
