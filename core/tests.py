@@ -123,6 +123,56 @@ class CoreViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "core/partials/search_results.html")
 
+    def test_search_matching_project_note_technology_and_empty(self):
+        import datetime
+        from notes.models import Note, NoteCategory
+        # Create Project
+        cat = ProjectCategory.objects.create(name="Automation")
+        p = Project.objects.create(
+            title="Telemetry Micro-Rover",
+            tagline="Sub-miniature autonomous rover",
+            project_type="mechatronics",
+            category=cat,
+            status="prototype",
+            start_date=datetime.date(2024, 1, 1),
+            overview="Autonomous rover chassis and telemetry testbench.",
+            is_published=True
+        )
+        # Create Note
+        note_cat = NoteCategory.objects.create(name="Sensors")
+        n = Note.objects.create(
+            title="IMU Noise Filtering Guide",
+            excerpt="Complementary filter practical derivation",
+            content_markdown="Kalman vs complementary filters",
+            category=note_cat,
+            is_published=True
+        )
+
+        # 1. Matching project
+        res_p = self.client.get(reverse("core:search"), {"q": "Rover"})
+        self.assertEqual(res_p.status_code, 200)
+        self.assertContains(res_p, "Telemetry Micro-Rover")
+
+        # 2. Matching note
+        res_n = self.client.get(reverse("core:search"), {"q": "Filtering"})
+        self.assertEqual(res_n.status_code, 200)
+        self.assertContains(res_n, "IMU Noise Filtering Guide")
+
+        # 3. Matching technology
+        res_t = self.client.get(reverse("core:search"), {"q": "Django"})
+        self.assertEqual(res_t.status_code, 200)
+        self.assertContains(res_t, "Django")
+
+        # 4. No results
+        res_none = self.client.get(reverse("core:search"), {"q": "xyznonexistentquery999"})
+        self.assertEqual(res_none.status_code, 200)
+        self.assertContains(res_none, "No items matched your search query")
+
+        # 5. Empty query
+        res_empty = self.client.get(reverse("core:search"), {"q": ""})
+        self.assertEqual(res_empty.status_code, 200)
+        self.assertContains(res_empty, "Type above to search")
+
     def test_robots_txt(self):
         response = self.client.get(reverse("core:robots_txt"))
         self.assertEqual(response.status_code, 200)
