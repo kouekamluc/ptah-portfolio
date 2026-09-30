@@ -415,6 +415,20 @@ class CoreViewTests(TestCase):
         self.assertEqual(response.status_code, 404)
         self.assertContains(response, "ERROR 404 // SIGNAL LOST", status_code=404)
 
+    def test_custom_403_and_500_views(self):
+        from core.views_error import custom_403, custom_500
+        from django.test import RequestFactory
+        factory = RequestFactory()
+        
+        req = factory.get("/")
+        res_403 = custom_403(req)
+        self.assertEqual(res_403.status_code, 403)
+        self.assertIn("ERROR 403 // ACCESS RESTRICTED", res_403.content.decode("utf-8"))
+
+        res_500 = custom_500(req)
+        self.assertEqual(res_500.status_code, 500)
+        self.assertIn("ERROR 500 // FAULT CONDITION", res_500.content.decode("utf-8"))
+
     def test_sitemap_xml(self):
         response = self.client.get(reverse("django.contrib.sitemaps.views.sitemap"))
         self.assertEqual(response.status_code, 200)
