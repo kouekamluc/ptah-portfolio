@@ -224,7 +224,7 @@ class Command(BaseCommand):
         # 5. Social Links (Safe placeholders editable in admin)
         SocialLink.objects.all().delete()
         socials_data = [
-            {"platform": "github", "display_name": "GitHub", "url": "https://github.com/YOUR_USERNAME", "username": "@YOUR_USERNAME", "show_in_hero": True, "show_in_nav": True, "show_in_footer": True, "display_order": 1},
+            {"platform": "github", "display_name": "GitHub", "url": "https://github.com/kouekamluc", "username": "@kouekamluc", "show_in_hero": True, "show_in_nav": True, "show_in_footer": True, "display_order": 1},
             {"platform": "linkedin", "display_name": "LinkedIn", "url": "https://linkedin.com/in/YOUR_USERNAME", "username": "Ptah Kouekam", "show_in_hero": True, "show_in_nav": True, "show_in_footer": True, "display_order": 2},
             {"platform": "youtube", "display_name": "YouTube", "url": "https://youtube.com/@YOUR_CHANNEL", "username": "@YOUR_CHANNEL", "show_in_hero": False, "show_in_nav": False, "show_in_footer": True, "display_order": 3},
             {"platform": "x", "display_name": "X / Twitter", "url": "https://x.com/YOUR_HANDLE", "username": "@YOUR_HANDLE", "show_in_hero": False, "show_in_nav": False, "show_in_footer": True, "display_order": 4},
