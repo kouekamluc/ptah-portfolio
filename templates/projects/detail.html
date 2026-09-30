@@ -1,0 +1,336 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ project.title }} | Case Study | {{ site_settings.full_name }}{% endblock %}
+{% block meta_description %}{{ project.tagline }}{% endblock %}
+
+{% block content %}
+<article class="py-12 md:py-16 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+  
+  <!-- Breadcrumb Navigation -->
+  <nav class="flex items-center space-x-2 text-xs font-mono text-slate-500 mb-8" aria-label="Breadcrumb">
+    <a href="{% url 'core:home' %}" class="hover:text-cyan-600 dark:hover:text-cyan-400">Home</a>
+    <span>/</span>
+    <a href="{% url 'projects:list' %}" class="hover:text-cyan-600 dark:hover:text-cyan-400">Projects</a>
+    <span>/</span>
+    <span class="text-slate-800 dark:text-slate-200 truncate">{{ project.title }}</span>
+  </nav>
+
+  <!-- Header Banner -->
+  <header class="border-b border-slate-200 dark:border-slate-800 pb-10 mb-12">
+    <div class="flex flex-wrap items-center gap-2 mb-4">
+      <span class="px-2.5 py-1 rounded-full text-xs font-mono font-medium {% if project.is_hardware_project %}bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20{% else %}bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 border border-cyan-500/20{% endif %}">
+        {{ project.get_project_type_display }}
+      </span>
+      <span class="px-2.5 py-1 rounded-full text-xs font-mono bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+        Status: {{ project.get_status_display }}
+      </span>
+      <span class="px-2.5 py-1 rounded-full text-xs font-mono text-slate-500">
+        {{ project.year_display }}
+      </span>
+    </div>
+
+    <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">
+      {{ project.title }}
+    </h1>
+
+    <p class="mt-4 text-lg text-slate-600 dark:text-slate-300 leading-relaxed font-sans max-w-3xl">
+      {{ project.tagline }}
+    </p>
+
+    <!-- Quick External Repositories & Demos -->
+    <div class="mt-6 flex flex-wrap items-center gap-3">
+      {% if project.github_url %}
+        <a href="{{ project.github_url }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-4 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 text-white text-xs font-mono transition-colors">
+          <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+          </svg>
+          <span>Source Code</span>
+        </a>
+      {% endif %}
+
+      {% if project.live_url %}
+        <a href="{{ project.live_url }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-mono transition-colors">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+          </svg>
+          <span>Live Deployment</span>
+        </a>
+      {% endif %}
+
+      {% if project.documentation_url %}
+        <a href="{{ project.documentation_url }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-mono transition-colors">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          <span>Technical Documentation</span>
+        </a>
+      {% endif %}
+
+      {% if project.video_url %}
+        <a href="{{ project.video_url }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-mono transition-colors">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <span>Video Demonstration</span>
+        </a>
+      {% endif %}
+    </div>
+
+    <!-- Technologies Utilized -->
+    <div class="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800/80">
+      <span class="block text-xs font-mono uppercase tracking-wider text-slate-400 mb-2">Technologies & Components:</span>
+      <div class="flex flex-wrap gap-2">
+        {% for tech in project.technologies.all %}
+          <span class="px-2.5 py-1 rounded text-xs font-mono bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">
+            {{ tech.name }}
+          </span>
+        {% endfor %}
+      </div>
+    </div>
+  </header>
+
+  <!-- 1. KEY QUANTITATIVE ENGINEERING METRICS -->
+  {% if metrics %}
+    <section class="mb-14">
+      <h2 class="text-xs font-mono font-semibold uppercase tracking-wider text-cyan-600 dark:text-cyan-400 mb-4">
+        Measured Performance & System Specifications
+      </h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+        {% for metric in metrics %}
+          <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0c1220] shadow-sm">
+            <span class="block text-xs font-mono text-slate-500 dark:text-slate-400 truncate">{{ metric.label }}</span>
+            <span class="block mt-1 font-mono text-xl sm:text-2xl font-bold text-slate-900 dark:text-cyan-400">{{ metric.value }}</span>
+            {% if metric.description %}
+              <span class="block mt-1 text-[11px] text-slate-500 leading-tight">{{ metric.description }}</span>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+
+  <!-- 2. CASE STUDY SECTIONS -->
+  <div class="space-y-12 text-slate-700 dark:text-slate-300">
+    
+    <!-- Overview -->
+    {% if project.overview %}
+      <section>
+        <h2 class="text-xl font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800 pb-2 mb-4">
+          01 // System Overview
+        </h2>
+        <div class="prose dark:prose-invert max-w-none text-sm sm:text-base leading-relaxed whitespace-pre-line">
+          {{ project.overview }}
+        </div>
+      </section>
+    {% endif %}
+
+    <!-- Problem & Objectives -->
+    {% if project.problem or project.objectives %}
+      <section class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {% if project.problem %}
+          <div class="p-6 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-[#0a0f1d]/60">
+            <h3 class="text-sm font-mono uppercase tracking-wider text-rose-600 dark:text-rose-400 font-semibold mb-2">
+              The Engineering Problem
+            </h3>
+            <div class="text-sm leading-relaxed whitespace-pre-line">
+              {{ project.problem }}
+            </div>
+          </div>
+        {% endif %}
+
+        {% if project.objectives %}
+          <div class="p-6 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-[#0a0f1d]/60">
+            <h3 class="text-sm font-mono uppercase tracking-wider text-emerald-600 dark:text-emerald-400 font-semibold mb-2">
+              Technical Objectives
+            </h3>
+            <div class="text-sm leading-relaxed whitespace-pre-line">
+              {{ project.objectives }}
+            </div>
+          </div>
+        {% endif %}
+      </section>
+    {% endif %}
+
+    <!-- Architecture & Hardware / Software Specifications -->
+    {% if project.system_architecture or project.hardware_specs or project.software_stack_details %}
+      <section>
+        <h2 class="text-xl font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800 pb-2 mb-4">
+          02 // System Architecture & Technical Specifications
+        </h2>
+
+        {% if project.system_architecture %}
+          <div class="mb-6">
+            <h3 class="text-sm font-mono uppercase tracking-wider text-slate-500 mb-2">System Topology</h3>
+            <div class="prose dark:prose-invert max-w-none text-sm sm:text-base leading-relaxed whitespace-pre-line">
+              {{ project.system_architecture }}
+            </div>
+          </div>
+        {% endif %}
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+          {% if project.hardware_specs %}
+            <div class="p-6 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0c1220]">
+              <h3 class="text-xs font-mono uppercase tracking-wider text-amber-600 dark:text-amber-400 font-semibold mb-3">
+                Hardware, Actuators & Circuits
+              </h3>
+              <div class="text-xs sm:text-sm font-mono leading-relaxed whitespace-pre-line text-slate-700 dark:text-slate-300">
+                {{ project.hardware_specs }}
+              </div>
+            </div>
+          {% endif %}
+
+          {% if project.software_stack_details %}
+            <div class="p-6 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0c1220]">
+              <h3 class="text-xs font-mono uppercase tracking-wider text-cyan-600 dark:text-cyan-400 font-semibold mb-3">
+                Software & Firmware Architecture
+              </h3>
+              <div class="text-xs sm:text-sm font-mono leading-relaxed whitespace-pre-line text-slate-700 dark:text-slate-300">
+                {{ project.software_stack_details }}
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </section>
+    {% endif %}
+
+    <!-- Engineering Process -->
+    {% if project.engineering_process %}
+      <section>
+        <h2 class="text-xl font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800 pb-2 mb-4">
+          03 // Engineering & Fabrication Process
+        </h2>
+        <div class="prose dark:prose-invert max-w-none text-sm sm:text-base leading-relaxed whitespace-pre-line">
+          {{ project.engineering_process }}
+        </div>
+      </section>
+    {% endif %}
+
+    <!-- Challenges & Technical Solution -->
+    {% if project.challenges or project.solution %}
+      <section class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {% if project.challenges %}
+          <div>
+            <h3 class="text-sm font-mono uppercase tracking-wider text-slate-500 mb-2">Technical Obstacles</h3>
+            <div class="prose dark:prose-invert max-w-none text-sm leading-relaxed whitespace-pre-line">
+              {{ project.challenges }}
+            </div>
+          </div>
+        {% endif %}
+
+        {% if project.solution %}
+          <div>
+            <h3 class="text-sm font-mono uppercase tracking-wider text-cyan-600 dark:text-cyan-400 mb-2">Engineering Decisions & Solution</h3>
+            <div class="prose dark:prose-invert max-w-none text-sm leading-relaxed whitespace-pre-line">
+              {{ project.solution }}
+            </div>
+          </div>
+        {% endif %}
+      </section>
+    {% endif %}
+
+    <!-- Quantitative Results -->
+    {% if project.quantitative_results %}
+      <section class="p-6 rounded-xl border border-cyan-500/30 bg-cyan-500/5">
+        <h2 class="text-base font-bold text-slate-900 dark:text-white mb-2 flex items-center space-x-2">
+          <svg class="w-5 h-5 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+          </svg>
+          <span>Measured Experimental Results</span>
+        </h2>
+        <div class="text-sm sm:text-base leading-relaxed whitespace-pre-line">
+          {{ project.quantitative_results }}
+        </div>
+      </section>
+    {% endif %}
+
+    <!-- Gallery / Engineering Visuals -->
+    {% if images %}
+      <section>
+        <h2 class="text-xl font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800 pb-2 mb-6">
+          04 // Schematics, CAD & Prototype Documentation
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {% for img in images %}
+            <figure class="rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden bg-white dark:bg-[#0c1220]">
+              <img src="{{ img.image.url }}" alt="{{ img.caption|default:project.title }}" class="w-full h-56 object-cover" loading="lazy">
+              {% if img.caption %}
+                <figcaption class="p-3 text-xs text-slate-500 font-mono border-t border-slate-100 dark:border-slate-800">
+                  <span class="text-cyan-500 font-semibold">{{ img.get_image_type_display }}:</span> {{ img.caption }}
+                </figcaption>
+              {% endif %}
+            </figure>
+          {% endfor %}
+        </div>
+      </section>
+    {% endif %}
+
+    <!-- Downloadable Engineering Assets -->
+    {% if files %}
+      <section>
+        <h2 class="text-xl font-bold text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800 pb-2 mb-4">
+          05 // Technical Assets & Downloads
+        </h2>
+        <ul class="divide-y divide-slate-100 dark:divide-slate-800 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden bg-white dark:bg-[#0c1220]">
+          {% for f in files %}
+            <li class="p-4 flex items-center justify-between text-xs sm:text-sm">
+              <div class="flex items-center space-x-3">
+                <svg class="w-5 h-5 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                <div>
+                  <span class="font-medium text-slate-900 dark:text-white block">{{ f.title }}</span>
+                  <span class="text-xs text-slate-400 font-mono">{{ f.get_file_type_display }}</span>
+                </div>
+              </div>
+              <a href="{{ f.file.url }}" download class="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 font-mono text-xs hover:bg-slate-100 dark:hover:bg-slate-800">
+                Download
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </section>
+    {% endif %}
+
+    <!-- Lessons Learned & Future Scope -->
+    {% if project.lessons_learned or project.future_improvements %}
+      <section class="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
+        {% if project.lessons_learned %}
+          <div>
+            <h3 class="text-sm font-mono uppercase tracking-wider text-slate-500 mb-2">Key Engineering Takeaways</h3>
+            <div class="prose dark:prose-invert max-w-none text-sm leading-relaxed whitespace-pre-line">
+              {{ project.lessons_learned }}
+            </div>
+          </div>
+        {% endif %}
+
+        {% if project.future_improvements %}
+          <div>
+            <h3 class="text-sm font-mono uppercase tracking-wider text-slate-500 mb-2">Next Iterations & Roadmap</h3>
+            <div class="prose dark:prose-invert max-w-none text-sm leading-relaxed whitespace-pre-line">
+              {{ project.future_improvements }}
+            </div>
+          </div>
+        {% endif %}
+      </section>
+    {% endif %}
+
+  </div>
+
+  <!-- Related Projects -->
+  {% if related_projects %}
+    <footer class="mt-20 pt-10 border-t border-slate-200 dark:border-slate-800">
+      <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-6">
+        Related Engineering & Software Systems
+      </h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for rel in related_projects %}
+          {% include 'partials/project_card.html' with project=rel %}
+        {% endfor %}
+      </div>
+    </footer>
+  {% endif %}
+
+</article>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}403 - Forbidden | {{ site_settings.full_name }}{% endblock %}
+
+{% block content %}
+<div class="py-24 text-center max-w-xl mx-auto px-4">
+  <span class="font-mono text-amber-600 dark:text-amber-400 text-sm font-semibold tracking-wider">ERROR 403 // ACCESS RESTRICTED</span>
+  <h1 class="mt-2 text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+    Permission Denied
+  </h1>
+  <p class="mt-4 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+    You do not possess security credentials to view or execute operations at this address.
+  </p>
+  <div class="mt-8">
+    <a href="{% url 'core:home' %}" class="px-4 py-2 rounded-lg bg-slate-900 dark:bg-slate-800 text-white text-xs font-mono">
+      Return Home &rarr;
+    </a>
+  </div>
+</div>
+{% endblock %}

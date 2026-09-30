@@ -1,0 +1,136 @@
+<!-- Command Palette Modal (Alpine.js + HTMX) -->
+<div 
+  x-show="commandPaletteOpen" 
+  x-cloak
+  @keydown.escape.window="commandPaletteOpen = false"
+  class="fixed inset-0 z-50 overflow-y-auto p-4 sm:p-6 md:p-20"
+  role="dialog" 
+  aria-modal="true"
+  style="display: none;"
+>
+  <!-- Backdrop -->
+  <div 
+    x-show="commandPaletteOpen"
+    x-transition:enter="ease-out duration-200"
+    x-transition:enter-start="opacity-0"
+    x-transition:enter-end="opacity-100"
+    x-transition:leave="ease-in duration-150"
+    x-transition:leave-start="opacity-100"
+    x-transition:leave-end="opacity-0"
+    @click="commandPaletteOpen = false"
+    class="fixed inset-0 bg-slate-900/60 dark:bg-black/75 backdrop-blur-sm transition-opacity"
+  ></div>
+
+  <!-- Palette Dialog Box -->
+  <div 
+    x-show="commandPaletteOpen"
+    x-transition:enter="ease-out duration-200"
+    x-transition:enter-start="opacity-0 scale-95"
+    x-transition:enter-end="opacity-100 scale-100"
+    x-transition:leave="ease-in duration-150"
+    x-transition:leave-start="opacity-100 scale-100"
+    x-transition:leave-end="opacity-0 scale-95"
+    class="mx-auto max-w-xl transform divide-y divide-slate-100 dark:divide-slate-800 overflow-hidden rounded-xl bg-white dark:bg-[#0c1220] shadow-2xl ring-1 ring-slate-900/10 dark:ring-white/10 transition-all border border-slate-200 dark:border-slate-800"
+  >
+    <div class="relative">
+      <svg class="pointer-events-none absolute top-3.5 left-4 h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+      </svg>
+      <input 
+        type="text" 
+        name="q"
+        placeholder="Type to search projects, notes, or tech stack..."
+        hx-get="{% url 'core:search' %}"
+        hx-trigger="input changed delay:250ms, search"
+        hx-target="#palette-results"
+        hx-indicator="#palette-spinner"
+        class="h-12 w-full border-0 bg-transparent pl-11 pr-4 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:ring-0 sm:text-sm"
+        autocomplete="off"
+        x-ref="searchInput"
+        x-init="$watch('commandPaletteOpen', value => { if (value) setTimeout(() => $refs.searchInput.focus(), 50) })"
+      >
+      <div id="palette-spinner" class="htmx-indicator absolute top-3.5 right-4 text-cyan-500">
+        <svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Live Search Results or Default Shortcuts -->
+    <div id="palette-results" class="max-h-80 scroll-py-2 divide-y divide-slate-100 dark:divide-slate-800/60 overflow-y-auto p-2 text-sm text-slate-700 dark:text-slate-300">
+      
+      <!-- Default Navigation Directory -->
+      <div class="p-2">
+        <span class="text-[10px] font-mono uppercase tracking-wider text-slate-400 px-2">Navigation Shortcuts</span>
+        <ul class="mt-1 space-y-1">
+          <li>
+            <a href="{% url 'projects:list' %}" class="flex items-center justify-between rounded-lg px-3 py-2 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60">
+              <span class="flex items-center space-x-2">
+                <span class="font-mono text-cyan-500">/</span>
+                <span>Projects Showcase</span>
+              </span>
+              <span class="font-mono text-xs text-slate-400">All domains</span>
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'projects:engineering' %}" class="flex items-center justify-between rounded-lg px-3 py-2 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60">
+              <span class="flex items-center space-x-2">
+                <span class="font-mono text-cyan-500">/</span>
+                <span>Engineering & Mechatronics</span>
+              </span>
+              <span class="font-mono text-xs text-slate-400">Hardware & circuits</span>
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'core:stack' %}" class="flex items-center justify-between rounded-lg px-3 py-2 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60">
+              <span class="flex items-center space-x-2">
+                <span class="font-mono text-cyan-500">/</span>
+                <span>Technologies & Skills</span>
+              </span>
+              <span class="font-mono text-xs text-slate-400">Tools</span>
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'notes:list' %}" class="flex items-center justify-between rounded-lg px-3 py-2 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60">
+              <span class="flex items-center space-x-2">
+                <span class="font-mono text-cyan-500">/</span>
+                <span>Technical Notes</span>
+              </span>
+              <span class="font-mono text-xs text-slate-400">Lab logs</span>
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'core:about' %}" class="flex items-center justify-between rounded-lg px-3 py-2 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60">
+              <span class="flex items-center space-x-2">
+                <span class="font-mono text-cyan-500">/</span>
+                <span>About & Philosophy</span>
+              </span>
+              <span class="font-mono text-xs text-slate-400">Background</span>
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'contact:index' %}" class="flex items-center justify-between rounded-lg px-3 py-2 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60">
+              <span class="flex items-center space-x-2">
+                <span class="font-mono text-cyan-500">/</span>
+                <span>Contact & Inquiries</span>
+              </span>
+              <span class="font-mono text-xs text-slate-400">Message</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- Palette Footer Instructions -->
+    <div class="flex items-center justify-between bg-slate-50 dark:bg-slate-900/60 px-4 py-2.5 text-[11px] text-slate-500">
+      <div class="flex items-center space-x-3">
+        <span><kbd class="font-mono bg-white dark:bg-slate-800 px-1 py-0.5 rounded border border-slate-300 dark:border-slate-700">ESC</kbd> to close</span>
+        <span><kbd class="font-mono bg-white dark:bg-slate-800 px-1 py-0.5 rounded border border-slate-300 dark:border-slate-700">Type</kbd> to live search</span>
+      </div>
+      <span class="font-mono text-[10px] text-cyan-600 dark:text-cyan-400">Ptah Kouekam Portfolio</span>
+    </div>
+
+  </div>
+</div>

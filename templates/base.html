@@ -1,0 +1,87 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  <title>{% block title %}{{ site_settings.full_name }} | {{ site_settings.professional_title }}{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}{{ site_settings.short_bio }}{% endblock %}">
+  <meta name="keywords" content="{{ site_settings.seo_meta_keywords }}">
+  <meta name="author" content="{{ site_settings.full_name }}">
+  <link rel="canonical" href="{{ request.build_absolute_uri }}">
+
+  <!-- OpenGraph / Social Metadata -->
+  <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+  <meta property="og:title" content="{% block og_title %}{{ site_settings.full_name }} | {{ site_settings.professional_title }}{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}{{ site_settings.short_bio }}{% endblock %}">
+  <meta property="og:url" content="{{ request.build_absolute_uri }}">
+  {% if site_settings.opengraph_image %}
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ site_settings.opengraph_image.url }}">
+  {% endif %}
+
+  <!-- Twitter / X Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{% block twitter_title %}{{ site_settings.full_name }} | {{ site_settings.professional_title }}{% endblock %}">
+  <meta name="twitter:description" content="{% block twitter_description %}{{ site_settings.short_bio }}{% endblock %}">
+
+  <!-- Favicon placeholder / SVG icon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90' font-family='monospace' font-weight='bold' fill='%2306b6d4'>P</text></svg>">
+
+  <!-- High-precision Web Fonts: Inter + JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Compiled Styles -->
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
+  <!-- Dark Mode Init Script (Guarantees zero theme flickering) -->
+  <script>
+    if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  </script>
+
+  <!-- Local HTMX & Alpine.js -->
+  <script src="{% static 'js/vendor/htmx.min.js' %}"></script>
+  <script defer src="{% static 'js/vendor/alpine.min.js' %}"></script>
+
+  {% block extra_head %}{% endblock %}
+</head>
+<body 
+  class="bg-slate-50 dark:bg-[#070b14] text-slate-800 dark:text-slate-100 min-h-screen flex flex-col font-sans transition-colors duration-200 antialiased selection:bg-cyan-500/20 selection:text-cyan-900 dark:selection:text-cyan-200"
+  hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+  x-data="{ commandPaletteOpen: false }"
+  @keydown.window.prevent.cmd.k="commandPaletteOpen = true"
+  @keydown.window.prevent.ctrl.k="commandPaletteOpen = true"
+>
+
+  <!-- Accessibility Skip Link -->
+  <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-50 bg-cyan-600 text-white px-4 py-2 rounded-md font-mono text-sm shadow-lg">
+    Skip to main content
+  </a>
+
+  <!-- Global Navigation Header -->
+  {% include 'partials/navbar.html' %}
+
+  <!-- Messages Banner -->
+  {% include 'partials/messages.html' %}
+
+  <!-- Main Content Container -->
+  <main id="main-content" class="flex-grow">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Command Palette Modal -->
+  {% include 'partials/command_palette.html' %}
+
+  <!-- Global Footer -->
+  {% include 'partials/footer.html' %}
+
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!-- Contact Form Response Partial -->
+{% if success %}
+  <div class="p-6 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-center animate-fade-in">
+    <div class="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-500 mx-auto flex items-center justify-center mb-3">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+      </svg>
+    </div>
+    <h3 class="text-base font-bold text-slate-900 dark:text-white">Inquiry Received</h3>
+    <p class="mt-2 text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-md mx-auto">
+      Thank you, {{ name }}. Your message has been safely delivered to my inbox and recorded in my system. I will review it and reply promptly.
+    </p>
+  </div>
+{% elif rate_limited %}
+  <div class="p-6 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-center animate-fade-in">
+    <div class="w-12 h-12 rounded-full bg-amber-500/20 text-amber-500 mx-auto flex items-center justify-center mb-3">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+      </svg>
+    </div>
+    <h3 class="text-base font-bold text-slate-900 dark:text-white">Transmission Rate Limit</h3>
+    <p class="mt-2 text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-md mx-auto">
+      {{ error_message }}
+    </p>
+  </div>
+{% else %}
+  <div class="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-xs text-rose-700 dark:text-rose-400 mb-4">
+    Please review the highlighted fields below and resubmit.
+    {% for field in form %}
+      {% if field.errors %}
+        <p class="font-mono mt-1">&bull; {{ field.label }}: {{ field.errors|striptags }}</p>
+      {% endif %}
+    {% endfor %}
+  </div>
+{% endif %}

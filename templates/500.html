@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}500 - Server Exception | {{ site_settings.full_name }}{% endblock %}
+
+{% block content %}
+<div class="py-24 text-center max-w-xl mx-auto px-4">
+  <span class="font-mono text-rose-600 dark:text-rose-400 text-sm font-semibold tracking-wider">ERROR 500 // FAULT CONDITION</span>
+  <h1 class="mt-2 text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+    Internal System Fault
+  </h1>
+  <p class="mt-4 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+    An unexpected server execution exception occurred. Telemetry has been logged and the state is under review.
+  </p>
+  <div class="mt-8">
+    <a href="{% url 'core:home' %}" class="px-4 py-2 rounded-lg bg-slate-900 dark:bg-slate-800 text-white text-xs font-mono">
+      Return Home &rarr;
+    </a>
+  </div>
+</div>
+{% endblock %}

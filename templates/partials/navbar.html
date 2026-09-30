@@ -1,0 +1,153 @@
+<header 
+  class="sticky top-0 z-40 w-full backdrop-blur-md bg-white/80 dark:bg-[#070b14]/85 border-b border-slate-200/80 dark:border-slate-800/80 transition-colors"
+  x-data="{ mobileMenuOpen: false, darkMode: document.documentElement.classList.contains('dark') }"
+>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      
+      <!-- Brand Identity -->
+      <div class="flex items-center space-x-3">
+        <a href="{% url 'core:home' %}" class="flex items-center space-x-2.5 group">
+          <span class="w-8 h-8 rounded-lg bg-slate-900 dark:bg-cyan-500/10 border border-slate-700/60 dark:border-cyan-500/30 flex items-center justify-center font-mono font-bold text-sm text-cyan-400 group-hover:border-cyan-400 transition-colors">
+            PK
+          </span>
+          <div class="flex flex-col">
+            <span class="text-sm font-semibold tracking-tight text-slate-900 dark:text-white group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
+              Ptah Kouekam
+            </span>
+            <span class="text-[10px] font-mono text-slate-500 dark:text-slate-400 tracking-wider uppercase">
+              Mechatronics & Software
+            </span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Desktop Navigation Links -->
+      <nav class="hidden md:flex items-center space-x-1 lg:space-x-2 text-sm font-medium">
+        <a href="{% url 'core:home' %}" class="px-3 py-1.5 rounded-md transition-colors {% if request.path == '/' %}text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-950/40 font-semibold{% else %}text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/50{% endif %}">
+          Home
+        </a>
+        <a href="{% url 'projects:list' %}" class="px-3 py-1.5 rounded-md transition-colors {% if '/projects/' in request.path and '/engineering/' not in request.path %}text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-950/40 font-semibold{% else %}text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/50{% endif %}">
+          Projects
+        </a>
+        <a href="{% url 'projects:engineering' %}" class="px-3 py-1.5 rounded-md transition-colors {% if '/engineering/' in request.path %}text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-950/40 font-semibold{% else %}text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/50{% endif %}">
+          Engineering
+        </a>
+        <a href="{% url 'core:stack' %}" class="px-3 py-1.5 rounded-md transition-colors {% if '/stack/' in request.path %}text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-950/40 font-semibold{% else %}text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/50{% endif %}">
+          Stack
+        </a>
+        <a href="{% url 'notes:list' %}" class="px-3 py-1.5 rounded-md transition-colors {% if '/notes/' in request.path %}text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-950/40 font-semibold{% else %}text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/50{% endif %}">
+          Notes
+        </a>
+        <a href="{% url 'core:about' %}" class="px-3 py-1.5 rounded-md transition-colors {% if '/about/' in request.path %}text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-950/40 font-semibold{% else %}text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/50{% endif %}">
+          About
+        </a>
+        <a href="{% url 'contact:index' %}" class="px-3 py-1.5 rounded-md transition-colors {% if '/contact/' in request.path %}text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-950/40 font-semibold{% else %}text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/50{% endif %}">
+          Contact
+        </a>
+      </nav>
+
+      <!-- Action Utilities: Command Palette Trigger & Theme Switcher -->
+      <div class="flex items-center space-x-2">
+        
+        <!-- Search / Command Palette Button -->
+        <button 
+          type="button" 
+          @click="commandPaletteOpen = true"
+          aria-label="Open command palette"
+          class="hidden sm:flex items-center space-x-2 px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700/80 bg-slate-100/60 dark:bg-slate-900/60 text-slate-500 dark:text-slate-400 hover:border-slate-400 dark:hover:border-slate-600 text-xs transition"
+        >
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+          <span class="font-sans">Search...</span>
+          <kbd class="font-mono text-[10px] bg-white dark:bg-slate-800 px-1.5 py-0.5 rounded border border-slate-300 dark:border-slate-700 text-slate-500">⌘K</kbd>
+        </button>
+
+        <!-- Theme Toggle Button -->
+        <button
+          type="button"
+          aria-label="Toggle dark/light theme"
+          @click="
+            darkMode = !darkMode;
+            if (darkMode) {
+              document.documentElement.classList.add('dark');
+              localStorage.setItem('color-theme', 'dark');
+            } else {
+              document.documentElement.classList.remove('dark');
+              localStorage.setItem('color-theme', 'light');
+            }
+          "
+          class="p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors"
+        >
+          <!-- Moon icon for light mode -->
+          <svg x-show="!darkMode" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+          </svg>
+          <!-- Sun icon for dark mode -->
+          <svg x-show="darkMode" style="display: none;" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+          </svg>
+        </button>
+
+        <!-- Mobile Menu Toggle Button -->
+        <button
+          type="button"
+          aria-label="Open mobile menu"
+          @click="mobileMenuOpen = !mobileMenuOpen"
+          class="md:hidden p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path x-show="!mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+            <path x-show="mobileMenuOpen" style="display: none;" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Mobile Drawer Menu (Accessible Alpine.js) -->
+  <div 
+    x-show="mobileMenuOpen" 
+    x-transition:enter="transition ease-out duration-150"
+    x-transition:enter-start="opacity-0 -translate-y-2"
+    x-transition:enter-end="opacity-100 translate-y-0"
+    x-transition:leave="transition ease-in duration-100"
+    x-transition:leave-start="opacity-100 translate-y-0"
+    x-transition:leave-end="opacity-0 -translate-y-2"
+    @click.away="mobileMenuOpen = false"
+    style="display: none;"
+    class="md:hidden border-b border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-[#070b14]/95 px-4 pt-2 pb-6 space-y-2 backdrop-blur-md"
+  >
+    <a href="{% url 'core:home' %}" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-lg text-sm font-medium {% if request.path == '/' %}bg-cyan-50 dark:bg-cyan-950/40 text-cyan-600 dark:text-cyan-400{% else %}text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50{% endif %}">
+      Home
+    </a>
+    <a href="{% url 'projects:list' %}" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-lg text-sm font-medium {% if '/projects/' in request.path and '/engineering/' not in request.path %}bg-cyan-50 dark:bg-cyan-950/40 text-cyan-600 dark:text-cyan-400{% else %}text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50{% endif %}">
+      Projects
+    </a>
+    <a href="{% url 'projects:engineering' %}" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-lg text-sm font-medium {% if '/engineering/' in request.path %}bg-cyan-50 dark:bg-cyan-950/40 text-cyan-600 dark:text-cyan-400{% else %}text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50{% endif %}">
+      Engineering Showcase
+    </a>
+    <a href="{% url 'core:stack' %}" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-lg text-sm font-medium {% if '/stack/' in request.path %}bg-cyan-50 dark:bg-cyan-950/40 text-cyan-600 dark:text-cyan-400{% else %}text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50{% endif %}">
+      Tech Stack
+    </a>
+    <a href="{% url 'notes:list' %}" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-lg text-sm font-medium {% if '/notes/' in request.path %}bg-cyan-50 dark:bg-cyan-950/40 text-cyan-600 dark:text-cyan-400{% else %}text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50{% endif %}">
+      Technical Notes
+    </a>
+    <a href="{% url 'core:about' %}" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-lg text-sm font-medium {% if '/about/' in request.path %}bg-cyan-50 dark:bg-cyan-950/40 text-cyan-600 dark:text-cyan-400{% else %}text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50{% endif %}">
+      About Me
+    </a>
+    <a href="{% url 'contact:index' %}" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-lg text-sm font-medium {% if '/contact/' in request.path %}bg-cyan-50 dark:bg-cyan-950/40 text-cyan-600 dark:text-cyan-400{% else %}text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50{% endif %}">
+      Contact
+    </a>
+    <div class="pt-3 border-t border-slate-200 dark:border-slate-800">
+      <a href="{% url 'core:search' %}" class="flex items-center space-x-2 px-3 py-2 text-sm text-slate-500 dark:text-slate-400">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <span>Search site</span>
+      </a>
+    </div>
+  </div>
+</header>

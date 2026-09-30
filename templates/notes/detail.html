@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ note.title }} | {{ site_settings.full_name }}{% endblock %}
+{% block meta_description %}{{ note.excerpt }}{% endblock %}
+{% block og_type %}article{% endblock %}
+
+{% block content %}
+<article class="py-12 md:py-20 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+  
+  <nav class="flex items-center space-x-2 text-xs font-mono text-slate-500 mb-8" aria-label="Breadcrumb">
+    <a href="{% url 'core:home' %}" class="hover:text-cyan-600 dark:hover:text-cyan-400">Home</a>
+    <span>/</span>
+    <a href="{% url 'notes:list' %}" class="hover:text-cyan-600 dark:hover:text-cyan-400">Notes</a>
+    <span>/</span>
+    <span class="text-slate-800 dark:text-slate-200 truncate">{{ note.title }}</span>
+  </nav>
+
+  <header class="border-b border-slate-200 dark:border-slate-800 pb-8 mb-10">
+    <div class="flex items-center space-x-3 text-xs font-mono text-slate-500 mb-3">
+      <span class="text-cyan-600 dark:text-cyan-400 font-semibold">{{ note.category.name }}</span>
+      <span>&bull;</span>
+      <span>{{ note.reading_time_minutes }} min read</span>
+      <span>&bull;</span>
+      <time datetime="{{ note.published_at|date:'Y-m-d' }}">{{ note.published_at|date:"F d, Y" }}</time>
+    </div>
+
+    <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">
+      {{ note.title }}
+    </h1>
+
+    <p class="mt-4 text-base text-slate-600 dark:text-slate-400 leading-relaxed font-sans">
+      {{ note.excerpt }}
+    </p>
+
+    {% if note.tag_list %}
+      <div class="mt-6 flex flex-wrap gap-2">
+        {% for tag in note.tag_list %}
+          <span class="px-2.5 py-1 rounded text-xs font-mono bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+            #{{ tag }}
+          </span>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </header>
+
+  <!-- Sanitized Markdown Content Output -->
+  <div class="prose dark:prose-invert prose-cyan max-w-none text-slate-800 dark:text-slate-200 leading-relaxed">
+    {{ note.content_html|safe }}
+  </div>
+
+  <!-- Related Notes -->
+  {% if related_notes %}
+    <footer class="mt-16 pt-10 border-t border-slate-200 dark:border-slate-800">
+      <h3 class="text-base font-bold text-slate-900 dark:text-white mb-4">
+        Related Notes in {{ note.category.name }}
+      </h3>
+      <div class="space-y-3">
+        {% for rel in related_notes %}
+          <a href="{{ rel.get_absolute_url }}" class="block p-4 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-cyan-500/50 transition-colors">
+            <span class="text-sm font-semibold text-slate-900 dark:text-white block">{{ rel.title }}</span>
+            <span class="text-xs text-slate-500 mt-1 block">{{ rel.excerpt|truncatechars:120 }}</span>
+          </a>
+        {% endfor %}
+      </div>
+    </footer>
+  {% endif %}
+
+</article>
+{% endblock %}
