@@ -4,6 +4,23 @@
 {% block meta_description %}{{ note.meta_description }}{% endblock %}
 {% block og_type %}article{% endblock %}
 
+{% block extra_head %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "{{ note.title|escapejs }}",
+  "description": "{{ note.meta_description|escapejs }}",
+  "author": {
+    "@type": "Person",
+    "name": "{{ site_settings.full_name|escapejs }}"
+  },
+  "datePublished": "{{ note.published_at|date:'Y-m-d' }}",
+  "inLanguage": "en"
+}
+</script>
+{% endblock %}
+
 {% block content %}
 <article class="py-12 md:py-20 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
   

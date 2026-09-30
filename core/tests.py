@@ -421,6 +421,51 @@ class CoreViewTests(TestCase):
         self.assertContains(response, "<urlset")
         self.assertContains(response, "<loc>")
 
+    def test_seo_metadata_and_structured_data(self):
+        import datetime
+        from notes.models import Note, NoteCategory
+        from projects.models import Project, ProjectCategory
+
+        # Test home page canonical and Person schema
+        res_home = self.client.get(reverse("core:home"))
+        self.assertEqual(res_home.status_code, 200)
+        self.assertContains(res_home, '<link rel="canonical" href="http://testserver/">')
+        self.assertContains(res_home, '"@type": "Person"')
+        self.assertContains(res_home, self.settings.full_name)
+
+        # Test note detail schema
+        note_cat = NoteCategory.objects.create(name="Control Theory Testing")
+        note = Note.objects.create(
+            title="Kalman Filter Tuning",
+            excerpt="Covariance matrix tuning",
+            content_markdown="State estimation formulas.",
+            category=note_cat,
+            is_published=True
+        )
+        res_note = self.client.get(reverse("notes:detail", kwargs={"slug": note.slug}))
+        self.assertEqual(res_note.status_code, 200)
+        self.assertContains(res_note, '"@type": "TechArticle"')
+        self.assertContains(res_note, "Kalman Filter Tuning")
+        self.assertContains(res_note, '<link rel="canonical"')
+
+        # Test project detail schema
+        proj_cat = ProjectCategory.objects.create(name="Embedded Builds")
+        proj = Project.objects.create(
+            title="CAN Bus Telemetry Rig",
+            tagline="Automotive CAN diagnostic unit",
+            project_type="embedded",
+            category=proj_cat,
+            status="completed",
+            start_date=datetime.date(2024, 1, 1),
+            overview="CAN bus telemetry logger",
+            is_published=True
+        )
+        res_proj = self.client.get(reverse("projects:detail", kwargs={"slug": proj.slug}))
+        self.assertEqual(res_proj.status_code, 200)
+        self.assertContains(res_proj, '"@type": "TechArticle"')
+        self.assertContains(res_proj, "CAN Bus Telemetry Rig")
+        self.assertContains(res_proj, '<link rel="canonical"')
+
     def test_organization_and_timeline_models(self):
         import datetime
         from .models import Organization

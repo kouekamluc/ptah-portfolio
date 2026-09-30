@@ -10,13 +10,13 @@
   <meta name="description" content="{% block meta_description %}{{ site_settings.default_meta_description|default:site_settings.short_bio }}{% endblock %}">
   <meta name="keywords" content="{{ site_settings.seo_meta_keywords }}">
   <meta name="author" content="{{ site_settings.full_name }}">
-  <link rel="canonical" href="{{ request.build_absolute_uri }}">
+  <link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
 
   <!-- OpenGraph / Social Metadata -->
   <meta property="og:type" content="{% block og_type %}website{% endblock %}">
   <meta property="og:title" content="{% block og_title %}{{ site_settings.full_name }} | {{ site_settings.professional_title }}{% endblock %}">
   <meta property="og:description" content="{% block og_description %}{{ site_settings.default_meta_description|default:site_settings.short_bio }}{% endblock %}">
-  <meta property="og:url" content="{{ request.build_absolute_uri }}">
+  <meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
   {% if site_settings.opengraph_image %}
     <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ site_settings.opengraph_image.url }}">
   {% endif %}
@@ -25,6 +25,24 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="{% block twitter_title %}{{ site_settings.full_name }} | {{ site_settings.professional_title }}{% endblock %}">
   <meta name="twitter:description" content="{% block twitter_description %}{{ site_settings.default_meta_description|default:site_settings.short_bio }}{% endblock %}">
+  {% if site_settings.opengraph_image %}
+    <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ site_settings.opengraph_image.url }}">
+  {% endif %}
+
+  <!-- Global Person JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "{{ site_settings.full_name|escapejs }}",
+    "jobTitle": "{{ site_settings.professional_title|escapejs }}",
+    "description": "{{ site_settings.short_bio|escapejs }}",
+    "url": "{{ request.scheme }}://{{ request.get_host }}"{% if global_socials %},
+    "sameAs": [
+      {% for s in global_socials %}"{{ s.url|escapejs }}"{% if not forloop.last %}, {% endif %}{% endfor %}
+    ]{% endif %}
+  }
+  </script>
 
   <!-- Favicon placeholder / SVG icon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90' font-family='monospace' font-weight='bold' fill='%2306b6d4'>P</text></svg>">
