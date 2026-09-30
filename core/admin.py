@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 from .models import (
     SiteSettings,
+    Resume,
     TechnologyCategory,
     Technology,
     CurrentlyBuilding,
@@ -56,6 +57,31 @@ class SiteSettingsAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+
+@admin.register(Resume)
+class ResumeAdmin(admin.ModelAdmin):
+    list_display = ("title", "version", "active", "uploaded_at", "file_link")
+    list_filter = ("active", "uploaded_at")
+    list_editable = ("active",)
+    search_fields = ("title", "version")
+    actions = ["make_active"]
+
+    def make_active(self, request, queryset):
+        # Trigger model save so unique active constraint runs
+        for resume in queryset:
+            resume.active = True
+            resume.save()
+    make_active.short_description = "Set as Active Resume"
+
+    def file_link(self, obj):
+        if obj.file:
+            try:
+                return format_html('<a href="{}" target="_blank" style="color: #06b6d4; font-weight: 600;">Download PDF</a>', obj.file.url)
+            except ValueError:
+                return "-"
+        return "-"
+    file_link.short_description = "Document"
 
 
 @admin.register(TechnologyCategory)

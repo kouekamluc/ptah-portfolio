@@ -162,14 +162,21 @@ def health_check(request):
 
 def cv_download_view(request):
     """
-    Clean permalink for downloading the latest CV.
+    Clean permalink for downloading the latest active CV.
     Gracefully redirects to contact page if no resume has been uploaded yet.
     """
     from django.shortcuts import redirect
     from django.contrib import messages
+    from .models import Resume
+    
+    active_cv = Resume.objects.filter(active=True).first()
+    if active_cv and active_cv.file:
+        return redirect(active_cv.file.url)
+
     site_settings = SiteSettings.get_settings()
     if site_settings.resume_file:
         return redirect(site_settings.resume_file.url)
+
     messages.info(request, "Direct CV download is currently being updated. Please send an inquiry to request an updated resume.")
     return redirect("contact:index")
 

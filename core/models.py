@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.exceptions import ValidationError
+from django.core.validators import FileExtensionValidator
 from django.utils.text import slugify
 
 
@@ -113,7 +114,14 @@ class SiteSettings(models.Model):
 
     @property
     def resume(self):
+        active_cv = Resume.objects.filter(active=True).first()
+        if active_cv and active_cv.file:
+            return active_cv.file
         return self.resume_file
+
+    @property
+    def active_resume(self):
+        return Resume.objects.filter(active=True).first()
 
     class Meta:
         verbose_name = "Site Settings"
@@ -136,6 +144,48 @@ class SiteSettings(models.Model):
 
     def __str__(self):
         return f"Site Settings ({self.full_name})"
+
+
+class Resume(models.Model):
+    """
+    Curriculum Vitae versions and PDF uploads.
+    Enforces that only one resume can be active at a time.
+    """
+    title = models.CharField(max_length=150, default="Curriculum Vitae")
+    file = models.FileField(
+        upload_to="resumes/",
+        validators=[FileExtensionValidator(allowed_extensions=["pdf"])],
+        help_text="Upload CV document (PDF format required)"
+    )
+    version = models.CharField(max_length=20, default="1.0", help_text="e.g. 2025.1 or 1.0")
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    active = models.BooleanField(
+        default=False,
+        help_text="Designate as active resume. Activating this unsets any previous active resume."
+    )
+
+    class Meta:
+        verbose_name = "Resume / CV"
+        verbose_name_plural = "Resumes / CVs"
+        ordering = ["-uploaded_at"]
+
+    def clean(self):
+        super().clean()
+        if self.file and hasattr(self.file, "name"):
+            ext = self.file.name.split(".")[-1].lower()
+            if ext != "pdf":
+                raise ValidationError({"file": "Only PDF files are supported for resume uploads."})
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        if self.active:
+            # Unset any other active resumes
+            Resume.objects.filter(active=True).exclude(pk=self.pk).update(active=False)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        status = "Active" if self.active else "Archived"
+        return f"{self.title} v{self.version} [{status}]"
 
 
 class TechnologyCategory(models.Model):

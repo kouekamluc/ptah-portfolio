@@ -191,6 +191,67 @@ class CoreViewTests(TestCase):
         # Should redirect to contact page with a message
         self.assertRedirects(response, reverse("contact:index"))
 
+    def test_resume_model_activation_and_uniqueness(self):
+        from .models import Resume
+        Resume.objects.all().delete()
+        pdf_file1 = SimpleUploadedFile("resume_v1.pdf", b"%PDF-1.4 content1", content_type="application/pdf")
+        pdf_file2 = SimpleUploadedFile("resume_v2.pdf", b"%PDF-1.4 content2", content_type="application/pdf")
+        
+        r1 = Resume.objects.create(title="CV 2024", version="1.0", file=pdf_file1, active=True)
+        self.assertTrue(r1.active)
+
+        # Activating r2 should deactivate r1
+        r2 = Resume.objects.create(title="CV 2025", version="2.0", file=pdf_file2, active=True)
+        r1.refresh_from_db()
+        self.assertFalse(r1.active)
+        self.assertTrue(r2.active)
+
+        # Non-PDF validation
+        bad_file = SimpleUploadedFile("malicious.exe", b"binary", content_type="application/x-msdownload")
+        bad_resume = Resume(title="Bad CV", version="0.1", file=bad_file, active=False)
+        with self.assertRaises(ValidationError):
+            bad_resume.full_clean()
+
+    def test_resume_active_download_and_visibility(self):
+        from .models import Resume
+        Resume.objects.all().delete()
+        self.settings.resume_file = None
+        self.settings.save()
+
+        # No resume: verify hero, about, contact hide the button
+        res_home = self.client.get(reverse("core:home"))
+        self.assertNotContains(res_home, "Download CV")
+
+        res_about = self.client.get(reverse("core:about"))
+        self.assertNotContains(res_about, "Download Curriculum Vitae")
+
+        res_contact = self.client.get(reverse("contact:index"))
+        self.assertNotContains(res_contact, "Download Curriculum Vitae")
+
+        # Inactive resume: still hidden
+        pdf_file = SimpleUploadedFile("my_resume.pdf", b"%PDF-1.4 active cv test", content_type="application/pdf")
+        res_obj = Resume.objects.create(title="Ptah CV", version="1.0", file=pdf_file, active=False)
+        
+        res_dl = self.client.get(reverse("core:cv_download"))
+        self.assertRedirects(res_dl, reverse("contact:index"))
+
+        # Active resume: visible on all 3 pages, and download redirects to file url
+        res_obj.active = True
+        res_obj.save()
+
+        res_dl_active = self.client.get(reverse("core:cv_download"))
+        self.assertEqual(res_dl_active.status_code, 302)
+        self.assertIn("my_resume", res_dl_active.url)
+
+        res_home_active = self.client.get(reverse("core:home"))
+        self.assertContains(res_home_active, "Download CV")
+
+        res_about_active = self.client.get(reverse("core:about"))
+        self.assertContains(res_about_active, "Download Curriculum Vitae")
+
+        res_contact_active = self.client.get(reverse("contact:index"))
+        self.assertContains(res_contact_active, "Download Curriculum Vitae")
+
     def test_hero_renders_identity(self):
         response = self.client.get(reverse("core:home"))
         self.assertEqual(response.status_code, 200)
