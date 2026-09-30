@@ -94,14 +94,68 @@ class ProjectDetailView(DetailView):
 
 def engineering_view(request):
     """Specialized showcase of mechatronics, embedded hardware, and circuit engineering."""
+    from notes.models import Note
+
     hardware_types = ["mechatronics", "embedded", "electronics", "control", "experimental"]
-    projects = (
+    base_qs = (
         Project.objects.filter(is_published=True, project_type__in=hardware_types)
         .select_related("category")
         .prefetch_related("technologies", "metrics", "images")
-        .order_by("display_order", "-start_date")
     )
+
+    category_slug = request.GET.get("category", "").strip()
+    status_filter = request.GET.get("status", "").strip()
+
+    projects = base_qs
+    if category_slug:
+        projects = projects.filter(category__slug=category_slug)
+    if status_filter:
+        projects = projects.filter(status=status_filter)
+
+    projects = projects.order_by("-is_featured", "display_order", "-start_date")
+
+    # Hardware categories that actually contain engineering projects
+    categories = ProjectCategory.objects.filter(
+        projects__in=base_qs
+    ).distinct().order_by("display_order", "name")
+
+    # Active hardware prototypes
+    active_prototypes = base_qs.filter(
+        status__in=["planning", "in_development", "prototype", "testing"]
+    ).order_by("display_order", "-start_date")[:4]
+
+    # Relevant hardware technologies
+    relevant_technologies = Technology.objects.filter(
+        is_active=True
+    ).filter(
+        Q(category__slug__in=["embedded", "embedded-systems", "hardware", "electronics", "engineering"]) |
+        Q(category__name__icontains="embedded") |
+        Q(category__name__icontains="electronics") |
+        Q(category__name__icontains="hardware") |
+        Q(category__name__icontains="engineering")
+    ).select_related("category").order_by("display_order", "name")[:12]
+
+    # Engineering notes
+    engineering_notes = Note.objects.filter(
+        is_published=True
+    ).filter(
+        Q(category__name__icontains="control") |
+        Q(category__name__icontains="hardware") |
+        Q(category__name__icontains="embedded") |
+        Q(category__name__icontains="electronics") |
+        Q(tags__icontains="Arduino") |
+        Q(tags__icontains="ESP32") |
+        Q(tags__icontains="Circuit") |
+        Q(tags__icontains="PID")
+    ).select_related("category").order_by("-published_at")[:3]
+
     return render(request, "projects/engineering.html", {
         "projects": projects,
+        "categories": categories,
+        "current_category": category_slug,
+        "current_status": status_filter,
+        "active_prototypes": active_prototypes,
+        "relevant_technologies": relevant_technologies,
+        "engineering_notes": engineering_notes,
         "section_title": "Mechatronics & Physical Engineering",
     })

@@ -134,10 +134,39 @@ class ProjectModelAndViewsTests(TestCase):
         self.assertNotContains(response, "Video Demonstration")
 
     def test_engineering_view(self):
+        # Create a pure software project that should NOT appear in engineering showcase
+        sw_cat = ProjectCategory.objects.create(name="Software Engineering")
+        sw_proj = Project.objects.create(
+            title="Django REST API",
+            tagline="Headless CMS backend",
+            project_type="software",
+            category=sw_cat,
+            status="completed",
+            start_date=datetime.date(2023, 1, 1),
+            overview="Software only API",
+            is_published=True
+        )
+
         response = self.client.get(reverse("projects:engineering"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Mechatronics & Physical Engineering")
         self.assertContains(response, "Balancing Robot")
+        # Software project must be excluded
+        self.assertNotContains(response, "Django REST API")
+        # Active prototype should be present in context
+        self.assertIn("active_prototypes", response.context)
+        self.assertIn(self.project, list(response.context["active_prototypes"]))
+
+        # Test category filtering
+        res_filtered = self.client.get(reverse("projects:engineering"), {"category": self.cat.slug})
+        self.assertEqual(res_filtered.status_code, 200)
+        self.assertContains(res_filtered, "Balancing Robot")
+
+        # Test empty state with non-matching category
+        other_cat = ProjectCategory.objects.create(name="Optics")
+        res_empty = self.client.get(reverse("projects:engineering"), {"category": other_cat.slug})
+        self.assertEqual(res_empty.status_code, 200)
+        self.assertContains(res_empty, "No hardware projects matching this category currently recorded")
 
     def test_unpublished_project_visibility(self):
         unpublished = Project.objects.create(

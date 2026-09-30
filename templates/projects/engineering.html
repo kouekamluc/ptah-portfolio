@@ -6,8 +6,8 @@
 <div class="py-12 md:py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
   
   <!-- Header -->
-  <div class="max-w-3xl mb-12">
-    <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full text-xs font-mono bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 mb-4">
+  <div class="max-w-3xl mb-10">
+    <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full text-xs font-mono bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 border border-cyan-500/20 mb-4">
       <span>Hardware &bull; Circuits &bull; Sensors &bull; Control Loops</span>
     </div>
     <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">
@@ -19,8 +19,8 @@
     </p>
   </div>
 
-  <!-- Engineering Workbench Highlights Banner -->
-  <div class="mb-12 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100/60 dark:bg-[#0a0f1d]/60 grid grid-cols-1 md:grid-cols-3 gap-6">
+  <!-- Engineering Highlights Banner -->
+  <div class="mb-10 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-[#0a0f1d]/60 grid grid-cols-1 md:grid-cols-3 gap-6">
     <div>
       <span class="text-xs font-mono uppercase text-slate-400">Microcontrollers</span>
       <h3 class="text-sm font-semibold text-slate-800 dark:text-slate-200 mt-1">ESP32 & Arduino</h3>
@@ -38,16 +38,115 @@
     </div>
   </div>
 
+  <!-- Category Filter Pills -->
+  {% if categories %}
+    <div class="mb-8 flex flex-wrap items-center gap-2">
+      <a 
+        href="{% url 'projects:engineering' %}" 
+        class="px-3.5 py-1.5 rounded-lg text-xs font-mono transition-colors border {% if not current_category %}bg-slate-900 dark:bg-cyan-500 text-white dark:text-slate-950 border-transparent font-semibold{% else %}border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-400 dark:hover:border-slate-600{% endif %}"
+      >
+        All Hardware
+      </a>
+      {% for cat in categories %}
+        <a 
+          href="{% url 'projects:engineering' %}?category={{ cat.slug }}" 
+          class="px-3.5 py-1.5 rounded-lg text-xs font-mono transition-colors border {% if current_category == cat.slug %}bg-slate-900 dark:bg-cyan-500 text-white dark:text-slate-950 border-transparent font-semibold{% else %}border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-400 dark:hover:border-slate-600{% endif %}"
+        >
+          {{ cat.name }}
+        </a>
+      {% endfor %}
+    </div>
+  {% endif %}
+
   <!-- Hardware Projects Grid -->
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    {% for project in projects %}
-      {% include 'partials/project_card.html' with project=project %}
-    {% empty %}
-      <div class="col-span-full text-center py-16 border border-dashed border-slate-300 dark:border-slate-800 rounded-xl">
-        <p class="text-sm text-slate-500">Hardware projects will appear here.</p>
+  <section class="mb-16">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {% for project in projects %}
+        {% include 'partials/project_card.html' with project=project %}
+      {% empty %}
+        <div class="col-span-full text-center py-16 border border-dashed border-slate-300 dark:border-slate-800 rounded-xl">
+          <p class="text-sm text-slate-500 font-mono">No hardware projects matching this category currently recorded.</p>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- Active Prototypes Section -->
+  {% if active_prototypes %}
+    <section class="mb-16 pt-10 border-t border-slate-200 dark:border-slate-800">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <span class="text-xs font-mono uppercase tracking-wider text-amber-600 dark:text-amber-400">Bench Prototypes</span>
+          <h2 class="text-xl font-bold text-slate-900 dark:text-white mt-1">Active Engineering Prototypes</h2>
+        </div>
       </div>
-    {% endfor %}
-  </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {% for proto in active_prototypes %}
+          <div class="p-5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0c1220] flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between text-xs font-mono mb-2">
+                <span class="px-2 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 font-semibold">{{ proto.get_status_display }}</span>
+                <span class="text-slate-400">{{ proto.category.name }}</span>
+              </div>
+              <h3 class="text-base font-semibold text-slate-900 dark:text-white">
+                <a href="{{ proto.get_absolute_url }}" class="hover:text-cyan-500 transition-colors">{{ proto.title }}</a>
+              </h3>
+              <p class="mt-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                {{ proto.short_description }}
+              </p>
+            </div>
+            {% if proto.next_milestone %}
+              <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 text-xs font-mono text-slate-500">
+                <strong class="text-cyan-600 dark:text-cyan-400">Next Milestone:</strong> {{ proto.next_milestone }}
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+
+  <!-- Relevant Engineering Technologies -->
+  {% if relevant_technologies %}
+    <section class="mb-16 pt-10 border-t border-slate-200 dark:border-slate-800">
+      <span class="text-xs font-mono uppercase tracking-wider text-cyan-600 dark:text-cyan-400">Hardware & Firmware Stack</span>
+      <h2 class="text-xl font-bold text-slate-900 dark:text-white mt-1 mb-6">Instruments, Microcontrollers & Tools</h2>
+      <div class="flex flex-wrap gap-2">
+        {% for tech in relevant_technologies %}
+          <div class="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0c1220] text-xs font-mono text-slate-800 dark:text-slate-200 flex items-center space-x-2">
+            <span class="font-bold">{{ tech.name }}</span>
+            {% if tech.proficiency %}
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500">{{ tech.get_proficiency_display }}</span>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+
+  <!-- Engineering Notes -->
+  {% if engineering_notes %}
+    <section class="pt-10 border-t border-slate-200 dark:border-slate-800">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <span class="text-xs font-mono uppercase tracking-wider text-cyan-600 dark:text-cyan-400">Lab Notebook</span>
+          <h2 class="text-xl font-bold text-slate-900 dark:text-white mt-1">Engineering Notes & Derivations</h2>
+        </div>
+        <a href="{% url 'notes:list' %}" class="text-xs font-mono text-cyan-600 dark:text-cyan-400 hover:underline">
+          View all notes &rarr;
+        </a>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {% for note in engineering_notes %}
+          <a href="{{ note.get_absolute_url }}" class="block p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0c1220] hover:border-cyan-500/50 transition-colors">
+            <span class="text-xs font-mono text-cyan-600 dark:text-cyan-400 block mb-1">{{ note.category.name }} &bull; {{ note.reading_time_minutes }} min read</span>
+            <h3 class="text-sm font-semibold text-slate-900 dark:text-white line-clamp-2">{{ note.title }}</h3>
+            <p class="mt-2 text-xs text-slate-500 line-clamp-2">{{ note.excerpt }}</p>
+          </a>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
 
 </div>
 {% endblock %}
