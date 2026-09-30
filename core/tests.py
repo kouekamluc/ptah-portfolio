@@ -486,3 +486,56 @@ class CoreViewTests(TestCase):
         self.assertContains(response, "Milestone Chronology & Experience")
         self.assertContains(response, "Embedded Robotics Project")
 
+    def test_organization_relationships_and_display(self):
+        import datetime
+        from .models import Organization
+        from projects.models import Project, ProjectCategory
+
+        Organization.objects.all().delete()
+
+        cat = ProjectCategory.objects.create(name="Initiatives Category")
+        proj = Project.objects.create(
+            title="KKEVO Media Platform",
+            tagline="Engineering media and tech publication",
+            project_type="software",
+            category=cat,
+            status="in_development",
+            start_date=datetime.date(2024, 1, 1),
+            overview="Technical media brand",
+            is_published=True
+        )
+
+        org_active = Organization.objects.create(
+            name="KKEVO Technology Network",
+            role="Creator & Technical Lead",
+            description="Technical journalism and open engineering community.",
+            start_date=datetime.date(2024, 2, 1),
+            is_active=True,
+            display_order=1
+        )
+        org_active.associated_projects.add(proj)
+        self.assertEqual(org_active.period, "2024 - Present")
+        self.assertTrue(org_active.active)
+        self.assertIn(proj, org_active.associated_projects.all())
+
+        org_inactive = Organization.objects.create(
+            name="Archived Lab Initiative",
+            role="Former Researcher",
+            description="Inactive student project.",
+            is_active=False
+        )
+
+        # Home page display
+        res_home = self.client.get(reverse("core:home"))
+        self.assertEqual(res_home.status_code, 200)
+        self.assertContains(res_home, "KKEVO Technology Network")
+        self.assertContains(res_home, "KKEVO Media Platform")
+        self.assertNotContains(res_home, "Archived Lab Initiative")
+
+        # About page display
+        res_about = self.client.get(reverse("core:about"))
+        self.assertEqual(res_about.status_code, 200)
+        self.assertContains(res_about, "KKEVO Technology Network")
+        self.assertContains(res_about, "KKEVO Media Platform")
+        self.assertNotContains(res_about, "Archived Lab Initiative")
+

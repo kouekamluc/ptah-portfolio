@@ -512,7 +512,15 @@ class Organization(models.Model):
     description = models.TextField()
     logo = models.ImageField(upload_to="organizations/", blank=True, null=True)
     website = models.URLField(blank=True)
+    start_date = models.DateField(blank=True, null=True)
+    end_date = models.DateField(blank=True, null=True)
     period = models.CharField(max_length=100, default="2024 - Present")
+    associated_projects = models.ManyToManyField(
+        "projects.Project",
+        blank=True,
+        related_name="organizations",
+        help_text="Projects created or maintained under this initiative"
+    )
     is_active = models.BooleanField(default=True)
     display_order = models.PositiveIntegerField(default=0)
 
@@ -521,9 +529,22 @@ class Organization(models.Model):
         verbose_name_plural = "Organizations & Initiatives"
         ordering = ["display_order", "name"]
 
+    @property
+    def active(self):
+        return self.is_active
+
+    @active.setter
+    def active(self, value):
+        self.is_active = value
+
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name)
+        if self.start_date and (not self.period or self.period == "2024 - Present"):
+            if self.end_date:
+                self.period = f"{self.start_date.year} - {self.end_date.year}"
+            else:
+                self.period = f"{self.start_date.year} - Present"
         super().save(*args, **kwargs)
 
     def __str__(self):

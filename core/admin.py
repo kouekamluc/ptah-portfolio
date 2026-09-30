@@ -158,3 +158,4 @@ class OrganizationAdmin(admin.ModelAdmin):
     list_editable = ("is_active", "display_order")
     search_fields = ("name", "role", "description")
     prepopulated_fields = {"slug": ("name",)}
+    filter_horizontal = ("associated_projects",)
