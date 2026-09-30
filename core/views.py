@@ -33,14 +33,18 @@ class HomeView(TemplateView):
             .prefetch_related("technologies")
             .order_by("display_order", "-start_date")[:3]
         )
+        from django.db.models import Prefetch
+        active_techs = Technology.objects.filter(is_active=True).order_by("display_order", "name")
         context["tech_categories"] = (
-            TechnologyCategory.objects.prefetch_related("technologies")
+            TechnologyCategory.objects.prefetch_related(
+                Prefetch("technologies", queryset=active_techs)
+            )
             .order_by("display_order")
         )
         context["highlighted_techs"] = (
-            Technology.objects.filter(highlighted=True)
+            Technology.objects.filter(is_active=True, highlighted=True)
             .select_related("category")
-            .order_by("category__display_order", "display_order")
+            .order_by("category__display_order", "display_order", "name")
         )
         context["latest_notes"] = (
             Note.objects.filter(is_published=True)
@@ -68,8 +72,12 @@ class StackView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        from django.db.models import Prefetch
+        active_techs = Technology.objects.filter(is_active=True).order_by("display_order", "name")
         context["categories"] = (
-            TechnologyCategory.objects.prefetch_related("technologies")
+            TechnologyCategory.objects.prefetch_related(
+                Prefetch("technologies", queryset=active_techs)
+            )
             .order_by("display_order")
         )
         return context

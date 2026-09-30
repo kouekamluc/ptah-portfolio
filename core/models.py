@@ -206,12 +206,40 @@ class Technology(models.Model):
         blank=True,
         help_text="Official documentation or project URL"
     )
+    is_active = models.BooleanField(
+        default=True,
+        help_text="Visible publicly across stack and showcase"
+    )
     display_order = models.PositiveIntegerField(default=0)
 
     class Meta:
         verbose_name = "Technology"
         verbose_name_plural = "Technologies"
         ordering = ["category__display_order", "display_order", "name"]
+
+    @property
+    def icon(self):
+        return self.icon_svg
+
+    @icon.setter
+    def icon(self, value):
+        self.icon_svg = value
+
+    @property
+    def featured(self):
+        return self.highlighted
+
+    @featured.setter
+    def featured(self, value):
+        self.highlighted = value
+
+    @property
+    def website_url(self):
+        return self.url
+
+    @website_url.setter
+    def website_url(self, value):
+        self.url = value
 
     def save(self, *args, **kwargs):
         if not self.slug:

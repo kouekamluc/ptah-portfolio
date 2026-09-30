@@ -18,13 +18,14 @@
 
   <div class="space-y-12">
     {% for cat in categories %}
+      {% if cat.technologies.all %}
       <div class="border border-slate-200 dark:border-slate-800 rounded-2xl p-6 sm:p-8 bg-white dark:bg-[#0c1220]">
         <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4 mb-6">
           <h2 class="text-lg font-bold text-slate-900 dark:text-white">
             {{ cat.name }}
           </h2>
           <span class="text-xs font-mono text-slate-400">
-            {{ cat.technologies.count }} tool{{ cat.technologies.count|pluralize }}
+            {{ cat.technologies.all|length }} tool{{ cat.technologies.all|length|pluralize }}
           </span>
         </div>
 
@@ -60,6 +61,11 @@
             </div>
           {% endfor %}
         </div>
+      </div>
+      {% endif %}
+    {% empty %}
+      <div class="p-12 text-center border border-dashed border-slate-300 dark:border-slate-800 rounded-xl text-slate-500 font-mono text-sm">
+        No stack components or technologies cataloged yet.
       </div>
     {% endfor %}
   </div>

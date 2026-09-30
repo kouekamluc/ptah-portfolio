@@ -369,6 +369,7 @@
 
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
     {% for cat in tech_categories %}
+      {% if cat.technologies.all %}
       <div class="border border-slate-200 dark:border-slate-800 rounded-xl p-6 bg-white dark:bg-[#0c1220]">
         <h3 class="text-sm font-mono font-semibold uppercase tracking-wider text-cyan-600 dark:text-cyan-400 mb-4 pb-2 border-b border-slate-100 dark:border-slate-800">
           {{ cat.name }}
@@ -391,6 +392,7 @@
           {% endfor %}
         </ul>
       </div>
+      {% endif %}
     {% endfor %}
   </div>
 

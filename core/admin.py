@@ -72,9 +72,9 @@ class TechnologyCategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Technology)
 class TechnologyAdmin(admin.ModelAdmin):
-    list_display = ("name", "category", "proficiency", "highlighted", "display_order", "years_used")
-    list_filter = ("category", "proficiency", "highlighted")
-    list_editable = ("highlighted", "display_order", "proficiency")
+    list_display = ("name", "category", "proficiency", "highlighted", "is_active", "display_order", "years_used")
+    list_filter = ("category", "proficiency", "highlighted", "is_active")
+    list_editable = ("highlighted", "is_active", "display_order", "proficiency")
     search_fields = ("name", "description", "category__name")
     prepopulated_fields = {"slug": ("name",)}
 

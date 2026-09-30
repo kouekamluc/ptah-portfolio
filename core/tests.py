@@ -35,10 +35,14 @@ class CoreModelTests(TestCase):
             category=cat,
             name="ESP32",
             proficiency="strong",
-            highlighted=True
+            highlighted=True,
+            url="https://espressif.com"
         )
         self.assertEqual(str(tech), "ESP32 (Embedded Hardware)")
         self.assertEqual(tech.slug, "esp32")
+        self.assertTrue(tech.featured)
+        self.assertEqual(tech.website_url, "https://espressif.com")
+        self.assertTrue(tech.is_active)
 
 
 class CoreViewTests(TestCase):
@@ -92,10 +96,21 @@ class CoreViewTests(TestCase):
         self.assertContains(response, "Academic Engineering Studies")
 
     def test_stack_page(self):
+        # Create an inactive technology
+        hidden_tech = Technology.objects.create(
+            category=self.cat,
+            name="Deprecated Framework",
+            is_active=False
+        )
+        # Create an empty category with 0 technologies
+        empty_cat = TechnologyCategory.objects.create(name="Empty Category", display_order=99)
+
         response = self.client.get(reverse("core:stack"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Technologies & Engineering Stack")
         self.assertContains(response, "Django")
+        self.assertNotContains(response, "Deprecated Framework")
+        self.assertNotContains(response, "Empty Category")
 
     def test_search_view_regular(self):
         response = self.client.get(reverse("core:search"), {"q": "Django"})
