@@ -1,7 +1,8 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.core.exceptions import ValidationError
-from .models import SiteSettings, TechnologyCategory, Technology, Education, TimelineItem
+from django.core.files.uploadedfile import SimpleUploadedFile
+from .models import SiteSettings, TechnologyCategory, Technology, Education, TimelineItem, SocialLink
 
 
 class CoreModelTests(TestCase):
@@ -123,11 +124,85 @@ class CoreViewTests(TestCase):
         # Should redirect to contact page with a message
         self.assertRedirects(response, reverse("contact:index"))
 
-    def test_cv_button_fallback_on_home(self):
+    def test_hero_renders_identity(self):
         response = self.client.get(reverse("core:home"))
         self.assertEqual(response.status_code, 200)
-        # Should display 'Request CV' instead of broken download link
-        self.assertContains(response, "Request CV")
+        self.assertContains(response, self.settings.full_name)
+        self.assertContains(response, "Engineer. Developer. Builder.")
+        self.assertContains(response, "View Projects")
+        self.assertContains(response, "Contact")
+
+    def test_hero_without_profile_image(self):
+        self.settings.profile_photo = None
+        self.settings.save()
+        response = self.client.get(reverse("core:home"))
+        self.assertEqual(response.status_code, 200)
+        # Should render intentional monogram, not a broken image tag
+        self.assertContains(response, "PK")
+
+    def test_hero_without_cv(self):
+        self.settings.resume_file = None
+        self.settings.save()
+        response = self.client.get(reverse("core:home"))
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "Download CV")
+
+    def test_hero_with_cv(self):
+        cv = SimpleUploadedFile("test_resume.pdf", b"%PDF-1.4 sample cv content", content_type="application/pdf")
+        self.settings.resume_file = cv
+        self.settings.save()
+        response = self.client.get(reverse("core:home"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Download CV")
+
+    def test_hero_without_social_links(self):
+        SocialLink.objects.all().delete()
+        response = self.client.get(reverse("core:home"))
+        self.assertEqual(response.status_code, 200)
+        # When no social links exist, empty state renders nothing
+        self.assertNotContains(response, "Profiles:")
+
+    def test_social_links_active_and_ordering_and_featured(self):
+        SocialLink.objects.all().delete()
+        s1 = SocialLink.objects.create(
+            platform="github",
+            display_name="GitHub Ptah",
+            url="https://github.com/kouekamluc",
+            display_order=2,
+            is_active=True,
+            show_in_hero=True,
+            featured=False
+        )
+        s2 = SocialLink.objects.create(
+            platform="linkedin",
+            display_name="LinkedIn Ptah",
+            url="https://linkedin.com/in/ptahkouekam",
+            display_order=1,
+            is_active=True,
+            show_in_hero=True,
+            featured=True
+        )
+        s3 = SocialLink.objects.create(
+            platform="x",
+            display_name="Inactive Link",
+            url="https://x.com/inactive",
+            display_order=0,
+            is_active=False,
+            show_in_hero=True
+        )
+
+        response = self.client.get(reverse("core:home"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "GitHub Ptah")
+        self.assertContains(response, "LinkedIn Ptah")
+        self.assertNotContains(response, "Inactive Link")
+        self.assertContains(response, "featured")
+        
+        # Test property alias and auto icon population
+        self.assertTrue(s1.active)
+        self.assertFalse(s3.active)
+        self.assertEqual(s1.icon_identifier, "github")
+        self.assertEqual(s2.icon_identifier, "linkedin")
 
     def test_custom_404_view(self):
         response = self.client.get("/non-existent-endpoint-404-check/")

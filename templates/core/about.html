@@ -287,6 +287,19 @@
         </div>
       </div>
     </section>
+    
+    <!-- Profiles & Repositories -->
+    {% if global_socials %}
+    <section class="border-t border-slate-200 dark:border-slate-800 pt-10">
+      <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-2">
+        Profiles & Repositories
+      </h2>
+      <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mb-6">
+        Verified code repositories, engineering channels, and professional profiles.
+      </p>
+      {% include 'partials/social_links.html' with links=global_socials variant="cards" %}
+    </section>
+    {% endif %}
 
   </div>
 </div>

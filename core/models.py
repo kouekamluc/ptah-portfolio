@@ -324,24 +324,34 @@ class SocialLink(models.Model):
     PLATFORM_CHOICES = [
         ("github", "GitHub"),
         ("linkedin", "LinkedIn"),
-        ("youtube", "YouTube"),
         ("x", "X / Twitter"),
+        ("youtube", "YouTube"),
         ("instagram", "Instagram"),
         ("facebook", "Facebook"),
         ("tiktok", "TikTok"),
-        ("email", "Email"),
-        ("website", "Personal / Other Site"),
+        ("website", "Personal Website"),
+        ("other", "Other"),
     ]
 
     platform = models.CharField(max_length=30, choices=PLATFORM_CHOICES)
     display_name = models.CharField(max_length=100)
     url = models.URLField(help_text="Complete URL with https://")
     username = models.CharField(max_length=100, blank=True, help_text="e.g. @username")
+    icon_identifier = models.CharField(
+        max_length=50,
+        blank=True,
+        default="",
+        help_text="Standard icon name (e.g. github, linkedin, youtube, x, instagram, facebook, tiktok, website, other)"
+    )
     icon_svg = models.TextField(
         blank=True,
-        help_text="Inline SVG path/markup for precise rendering"
+        help_text="Optional inline SVG path/markup for custom rendering without arbitrary HTML"
     )
     is_active = models.BooleanField(default=True)
+    featured = models.BooleanField(
+        default=False,
+        help_text="Featured links appear more prominently"
+    )
     show_in_hero = models.BooleanField(default=True)
     show_in_nav = models.BooleanField(default=False)
     show_in_footer = models.BooleanField(default=True)
@@ -351,6 +361,19 @@ class SocialLink(models.Model):
         verbose_name = "Social Link"
         verbose_name_plural = "Social Links"
         ordering = ["display_order", "display_name"]
+
+    @property
+    def active(self):
+        return self.is_active
+
+    @active.setter
+    def active(self, value):
+        self.is_active = value
+
+    def save(self, *args, **kwargs):
+        if not self.icon_identifier:
+            self.icon_identifier = self.platform
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.display_name} ({self.get_platform_display()})"

@@ -17,15 +17,17 @@
       <div class="lg:col-span-7 space-y-6">
         
         <!-- Live Status Pill -->
+        {% if site_settings.availability_status %}
         <div class="inline-flex items-center space-x-2.5 px-3 py-1 rounded-full text-xs font-mono bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
           <span class="relative flex h-2 w-2">
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
             <span class="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
           </span>
           <span class="text-slate-600 dark:text-slate-300">
-            Mechatronics &bull; Engineering Science &bull; {{ site_settings.location }}
+            {{ site_settings.get_availability_status_display }}{% if site_settings.location %} &bull; {{ site_settings.location }}{% endif %}
           </span>
         </div>
+        {% endif %}
 
         <!-- Identity & Positioning -->
         <div>
@@ -41,7 +43,7 @@
           {{ site_settings.short_bio }}
         </p>
 
-        <!-- Action CTAs with Graceful CV Fallback -->
+        <!-- Action CTAs: View Projects, Contact, and File Link -->
         <div class="pt-2 flex flex-wrap items-center gap-3">
           <a 
             href="{% url 'projects:list' %}"
@@ -54,20 +56,20 @@
           </a>
 
           <a 
-            href="{% url 'core:about' %}"
-            class="inline-flex items-center justify-center px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 font-medium text-sm transition-colors"
-          >
-            About Me
-          </a>
-
-          <a 
             href="{% url 'contact:index' %}"
             class="inline-flex items-center justify-center px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 font-medium text-sm transition-colors"
           >
             Contact
           </a>
 
-          {% if site_settings.resume_file %}
+          <a 
+            href="{% url 'core:about' %}"
+            class="inline-flex items-center justify-center px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 font-medium text-sm transition-colors"
+          >
+            About Me
+          </a>
+
+          {% if site_settings.resume %}
             <a 
               href="{% url 'core:cv_download' %}" 
               class="inline-flex items-center justify-center px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:border-cyan-500/50 text-slate-600 dark:text-slate-400 hover:text-cyan-500 text-sm font-mono transition-colors"
@@ -75,34 +77,15 @@
               <svg class="mr-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
               </svg>
-              <span>CV (v{{ site_settings.resume_version }})</span>
-            </a>
-          {% else %}
-            <a 
-              href="{% url 'contact:index' %}?subject=CV+Inquiry"
-              class="inline-flex items-center justify-center px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:border-cyan-500/50 text-slate-500 dark:text-slate-400 hover:text-cyan-500 text-xs font-mono transition-colors"
-            >
-              <span>Request CV &rarr;</span>
+              <span>Download CV (v{{ site_settings.resume_version }})</span>
             </a>
           {% endif %}
         </div>
 
-        <!-- Social Ecosystem Links -->
-        <div class="pt-4 flex flex-wrap items-center gap-3 text-slate-500 dark:text-slate-400">
-          <span class="text-xs font-mono uppercase tracking-wider text-slate-400">Profiles:</span>
-          {% for social in global_hero_socials %}
-            <a 
-              href="{{ social.url }}" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              aria-label="{{ social.display_name }}"
-              class="text-xs font-mono font-medium hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors"
-            >
-              {{ social.display_name }}
-            </a>
-            {% if not forloop.last %}<span class="text-slate-300 dark:text-slate-700">&bull;</span>{% endif %}
-          {% endfor %}
-        </div>
+        <!-- Social Ecosystem Links (only rendered if social links configured) -->
+        {% if global_hero_socials %}
+          {% include 'partials/social_links.html' with links=global_hero_socials variant="hero" %}
+        {% endif %}
 
       </div>
 
@@ -112,28 +95,32 @@
           
           <!-- Card Header Bar with Photo or Technical Monogram -->
           <div class="flex items-center space-x-4 border-b border-slate-100 dark:border-slate-800/80 pb-4 mb-4">
-            {% if site_settings.profile_photo %}
+            {% if site_settings.profile_image %}
               <img 
-                src="{{ site_settings.profile_photo.url }}" 
+                src="{{ site_settings.profile_image.url }}" 
                 alt="{{ site_settings.full_name }}" 
                 class="w-14 h-14 rounded-xl object-cover border border-slate-200 dark:border-slate-700 shadow-sm"
               >
             {% else %}
               <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-slate-900 to-slate-800 dark:from-[#111928] dark:to-[#070b14] border border-cyan-500/30 flex items-center justify-center text-cyan-400 font-mono font-bold text-lg shadow-sm relative">
                 <span class="tracking-tight">PK</span>
+                {% if site_settings.availability_status %}
                 <span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white dark:border-[#0c1220]"></span>
+                {% endif %}
               </div>
             {% endif %}
             <div class="flex-1 min-w-0">
               <div class="flex items-center justify-between text-xs font-mono">
-                <span class="text-cyan-600 dark:text-cyan-400 font-semibold tracking-wider uppercase truncate">Ptah Kouekam</span>
+                <span class="text-cyan-600 dark:text-cyan-400 font-semibold tracking-wider uppercase truncate">{{ site_settings.full_name }}</span>
+                {% if site_settings.availability_status %}
                 <span class="text-emerald-600 dark:text-emerald-400 flex items-center space-x-1 flex-shrink-0">
                   <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                   <span>{{ site_settings.get_availability_status_display }}</span>
                 </span>
+                {% endif %}
               </div>
               <p class="text-xs text-slate-500 dark:text-slate-400 font-mono truncate mt-0.5">
-                Mechatronics &bull; Italy Base
+                Mechatronics &bull; {{ site_settings.location|default:"Italy" }}
               </p>
             </div>
           </div>

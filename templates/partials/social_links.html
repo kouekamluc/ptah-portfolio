@@ -1,0 +1,109 @@
+{% if links %}
+  {% if variant == "hero" %}
+    <div class="pt-3 flex flex-wrap items-center gap-2.5">
+      <span class="text-xs font-mono uppercase tracking-wider text-slate-400 dark:text-slate-500 mr-1">Profiles:</span>
+      {% for social in links %}
+        <a 
+          href="{{ social.url }}" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          aria-label="{{ social.display_name }}{% if social.username %} ({{ social.username }}){% endif %}"
+          class="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-md text-xs font-mono transition-all {% if social.featured %}bg-cyan-50 dark:bg-cyan-950/40 text-cyan-700 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-800 font-semibold shadow-sm{% else %}bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:text-cyan-600 dark:hover:text-cyan-400 hover:border-cyan-500/40{% endif %}"
+        >
+          {% if social.icon_identifier == "github" %}
+            <svg class="w-3.5 h-3.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+          {% elif social.icon_identifier == "linkedin" %}
+            <svg class="w-3.5 h-3.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+          {% elif social.icon_identifier == "x" %}
+            <svg class="w-3.5 h-3.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          {% elif social.icon_identifier == "youtube" %}
+            <svg class="w-3.5 h-3.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          {% else %}
+            <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+          {% endif %}
+          <span>{{ social.display_name }}</span>
+        </a>
+      {% endfor %}
+    </div>
+
+  {% elif variant == "footer" %}
+    <ul class="space-y-2 text-sm text-slate-600 dark:text-slate-400">
+      {% for social in links %}
+        <li>
+          <a 
+            href="{{ social.url }}" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            aria-label="{{ social.display_name }}{% if social.username %} ({{ social.username }}){% endif %}"
+            class="inline-flex items-center space-x-2 hover:text-cyan-500 transition-colors {% if social.featured %}font-semibold text-slate-800 dark:text-slate-200{% endif %}"
+          >
+            <span>{{ social.display_name }}</span>
+            {% if social.username %}
+              <span class="text-[11px] text-slate-400 font-mono">({{ social.username }})</span>
+            {% endif %}
+            {% if social.featured %}
+              <span class="px-1.5 py-0.2 rounded text-[9px] font-mono bg-cyan-100 dark:bg-cyan-900/60 text-cyan-700 dark:text-cyan-300">featured</span>
+            {% endif %}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+
+  {% elif variant == "cards" or variant == "contact" or variant == "about" %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      {% for social in links %}
+        <a 
+          href="{{ social.url }}" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          aria-label="{{ social.display_name }}{% if social.username %} ({{ social.username }}){% endif %}"
+          class="flex items-center justify-between p-3.5 rounded-xl border transition-all {% if social.featured %}border-cyan-400/50 bg-cyan-50/40 dark:bg-cyan-950/20 shadow-sm hover:border-cyan-500{% else %}border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 hover:border-slate-400 dark:hover:border-slate-700{% endif %} group"
+        >
+          <div class="flex items-center space-x-3 min-w-0">
+            <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 {% if social.featured %}bg-cyan-100 dark:bg-cyan-900/50 text-cyan-600 dark:text-cyan-300{% else %}bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 group-hover:text-cyan-500{% endif %}">
+              {% if social.icon_identifier == "github" %}
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+              {% elif social.icon_identifier == "linkedin" %}
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+              {% elif social.icon_identifier == "x" %}
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              {% elif social.icon_identifier == "youtube" %}
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+              {% else %}
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+              {% endif %}
+            </div>
+            <div class="min-w-0 truncate">
+              <div class="text-sm font-medium text-slate-800 dark:text-slate-200 flex items-center space-x-1.5">
+                <span class="truncate">{{ social.display_name }}</span>
+                {% if social.featured %}
+                  <span class="px-1.5 py-0.2 rounded text-[9px] font-mono bg-cyan-100 dark:bg-cyan-900/60 text-cyan-700 dark:text-cyan-300">featured</span>
+                {% endif %}
+              </div>
+              {% if social.username %}
+                <div class="text-xs font-mono text-slate-400 dark:text-slate-500 truncate">{{ social.username }}</div>
+              {% endif %}
+            </div>
+          </div>
+          <svg class="w-4 h-4 text-slate-400 group-hover:text-cyan-500 group-hover:translate-x-0.5 transition-all flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+        </a>
+      {% endfor %}
+    </div>
+
+  {% else %}
+    <!-- Default inline row -->
+    <div class="flex flex-wrap items-center gap-2">
+      {% for social in links %}
+        <a 
+          href="{{ social.url }}" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          aria-label="{{ social.display_name }}{% if social.username %} ({{ social.username }}){% endif %}"
+          class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-mono border transition-all {% if social.featured %}bg-cyan-50 dark:bg-cyan-950/40 border-cyan-300 dark:border-cyan-800 text-cyan-700 dark:text-cyan-300 font-semibold{% else %}bg-slate-100 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:text-cyan-600 dark:hover:text-cyan-400 hover:border-cyan-500/40{% endif %}"
+        >
+          <span>{{ social.display_name }}</span>
+        </a>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endif %}

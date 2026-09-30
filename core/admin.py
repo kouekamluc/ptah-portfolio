@@ -118,10 +118,11 @@ class EducationAdmin(admin.ModelAdmin):
 
 @admin.register(SocialLink)
 class SocialLinkAdmin(admin.ModelAdmin):
-    list_display = ("display_name", "platform", "username", "url", "is_active", "show_in_hero", "show_in_footer", "display_order")
-    list_filter = ("platform", "is_active", "show_in_hero", "show_in_footer")
-    list_editable = ("is_active", "show_in_hero", "show_in_footer", "display_order")
-    search_fields = ("display_name", "username", "url")
+    list_display = ("display_name", "platform", "icon_identifier", "username", "url", "featured", "is_active", "show_in_hero", "show_in_footer", "display_order")
+    list_filter = ("platform", "featured", "is_active", "show_in_hero", "show_in_footer")
+    list_editable = ("featured", "is_active", "show_in_hero", "show_in_footer", "display_order")
+    search_fields = ("display_name", "username", "url", "icon_identifier")
+    ordering = ("display_order", "display_name")
 
 
 @admin.register(Organization)
