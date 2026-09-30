@@ -1,6 +1,7 @@
 from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
+from django.core.exceptions import ValidationError
 
 
 class ProjectCategory(models.Model):
@@ -42,12 +43,13 @@ class Project(models.Model):
     ]
 
     STATUS_CHOICES = [
-        ("concept", "Concept & Planning"),
+        ("concept", "Concept"),
+        ("planning", "Planning"),
         ("in_development", "In Development"),
-        ("prototype", "Prototype Built"),
-        ("testing", "Testing & Verification"),
+        ("prototype", "Prototype"),
+        ("testing", "Testing"),
         ("completed", "Completed"),
-        ("maintained", "Actively Maintained"),
+        ("maintained", "Maintained"),
         ("archived", "Archived"),
     ]
 
@@ -142,13 +144,52 @@ class Project(models.Model):
         verbose_name_plural = "Projects"
         ordering = ["display_order", "-start_date", "-created_at"]
 
+    def clean(self):
+        super().clean()
+        if self.start_date and self.end_date:
+            if self.end_date < self.start_date:
+                raise ValidationError({"end_date": "End date cannot be earlier than start date."})
+
     def save(self, *args, **kwargs):
+        self.full_clean()
         if not self.slug:
             self.slug = slugify(self.title)
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse("projects:detail", kwargs={"slug": self.slug})
+
+    @property
+    def short_description(self):
+        return self.tagline
+
+    @short_description.setter
+    def short_description(self, value):
+        self.tagline = value
+
+    @property
+    def full_description(self):
+        return self.overview
+
+    @full_description.setter
+    def full_description(self, value):
+        self.overview = value
+
+    @property
+    def featured(self):
+        return self.is_featured
+
+    @featured.setter
+    def featured(self, value):
+        self.is_featured = value
+
+    @property
+    def results(self):
+        return self.quantitative_results
+
+    @results.setter
+    def results(self, value):
+        self.quantitative_results = value
 
     @property
     def year_display(self):
@@ -202,6 +243,11 @@ class ProjectImage(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="images")
     image = models.ImageField(upload_to="projects/gallery/")
     caption = models.CharField(max_length=255, blank=True)
+    alt_text = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Descriptive alternative text for screen readers"
+    )
     image_type = models.CharField(max_length=30, choices=IMAGE_TYPE_CHOICES, default="photo")
     display_order = models.PositiveIntegerField(default=0)
 
@@ -209,6 +255,11 @@ class ProjectImage(models.Model):
         verbose_name = "Project Image"
         verbose_name_plural = "Project Images"
         ordering = ["display_order", "id"]
+
+    def save(self, *args, **kwargs):
+        if not self.alt_text and self.caption:
+            self.alt_text = self.caption
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Image for {self.project.title} - {self.get_image_type_display()}"

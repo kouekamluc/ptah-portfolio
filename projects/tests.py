@@ -1,8 +1,9 @@
 import datetime
 from django.test import TestCase, Client
 from django.urls import reverse
+from django.core.exceptions import ValidationError
 from core.models import Technology, TechnologyCategory
-from .models import Project, ProjectCategory, ProjectMetric
+from .models import Project, ProjectCategory, ProjectMetric, ProjectImage
 
 
 class ProjectModelAndViewsTests(TestCase):
@@ -36,6 +37,62 @@ class ProjectModelAndViewsTests(TestCase):
         self.assertEqual(self.project.slug, "balancing-robot")
         self.assertTrue(self.project.is_hardware_project)
         self.assertEqual(self.project.year_display, "2024 - Present")
+        # Test property aliases
+        self.assertEqual(self.project.short_description, self.project.tagline)
+        self.assertEqual(self.project.full_description, self.project.overview)
+        self.assertEqual(self.project.featured, self.project.is_featured)
+        self.assertEqual(self.project.results, self.project.quantitative_results)
+
+    def test_project_date_validation(self):
+        # End date earlier than start date must raise ValidationError
+        invalid_project = Project(
+            title="Invalid Date Project",
+            tagline="Timing paradox",
+            project_type="mechatronics",
+            category=self.cat,
+            status="planning",
+            start_date=datetime.date(2025, 6, 1),
+            end_date=datetime.date(2025, 1, 1),
+            overview="Testing date validator"
+        )
+        with self.assertRaises(ValidationError):
+            invalid_project.clean()
+
+    def test_project_image_alt_text_fallback(self):
+        img = ProjectImage(
+            project=self.project,
+            caption="Oscilloscope trace of closed-loop step response",
+            image_type="plot"
+        )
+        img.save()
+        self.assertEqual(img.alt_text, "Oscilloscope trace of closed-loop step response")
+
+    def test_project_ordering_and_status(self):
+        p1 = Project.objects.create(
+            title="Alpha Project",
+            tagline="Alpha",
+            project_type="software",
+            category=self.cat,
+            status="planning",
+            start_date=datetime.date(2023, 1, 1),
+            display_order=10,
+            overview="Alpha overview"
+        )
+        p2 = Project.objects.create(
+            title="Beta Project",
+            tagline="Beta",
+            project_type="software",
+            category=self.cat,
+            status="completed",
+            start_date=datetime.date(2024, 1, 1),
+            display_order=1,
+            overview="Beta overview"
+        )
+        projects = list(Project.objects.all())
+        # Display order 0 (balancing robot) should come first, then display_order 1 (Beta), then 10 (Alpha)
+        self.assertEqual(projects[0], self.project)
+        self.assertEqual(projects[1], p2)
+        self.assertEqual(projects[2], p1)
 
     def test_project_list_view(self):
         response = self.client.get(reverse("projects:list"))

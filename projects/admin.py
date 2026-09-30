@@ -12,7 +12,7 @@ class ProjectMetricInline(admin.TabularInline):
 class ProjectImageInline(admin.TabularInline):
     model = ProjectImage
     extra = 1
-    fields = ("image", "caption", "image_type", "display_order", "preview")
+    fields = ("image", "alt_text", "caption", "image_type", "display_order", "preview")
     readonly_fields = ("preview",)
 
     def preview(self, obj):
