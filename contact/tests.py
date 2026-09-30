@@ -79,3 +79,27 @@ class ContactViewTests(TestCase):
         # Should not create 4th message
         self.assertEqual(ContactMessage.objects.count(), 3)
         self.assertContains(res_4, "Rate limit reached")
+
+    def test_contact_post_invalid_email(self):
+        data = {
+            "name": "Invalid Email User",
+            "email": "not-an-email",
+            "subject": "Question",
+            "message": "Hello world",
+            "website": "",
+        }
+        res = self.client.post(reverse("contact:index"), data)
+        self.assertEqual(res.status_code, 200)
+        self.assertFalse(ContactMessage.objects.filter(name="Invalid Email User").exists())
+
+    def test_contact_post_missing_field(self):
+        data = {
+            "name": "Missing Message User",
+            "email": "user@example.com",
+            "subject": "Question",
+            "message": "",  # missing required message
+            "website": "",
+        }
+        res = self.client.post(reverse("contact:index"), data)
+        self.assertEqual(res.status_code, 200)
+        self.assertFalse(ContactMessage.objects.filter(name="Missing Message User").exists())
