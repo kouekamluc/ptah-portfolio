@@ -3,6 +3,28 @@
 
 {% block title %}{{ project.title }} | Case Study | {{ site_settings.full_name }}{% endblock %}
 {% block meta_description %}{{ project.tagline }}{% endblock %}
+{% block og_type %}article{% endblock %}
+{% block og_title %}{{ project.title }} | Case Study | {{ site_settings.full_name }}{% endblock %}
+{% block og_description %}{{ project.tagline }}{% endblock %}
+{% block twitter_title %}{{ project.title }} | Case Study{% endblock %}
+{% block twitter_description %}{{ project.tagline }}{% endblock %}
+
+{% block extra_head %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "{{ project.title|escapejs }}",
+  "description": "{{ project.tagline|escapejs }}",
+  "author": {
+    "@type": "Person",
+    "name": "{{ site_settings.full_name|escapejs }}"
+  },
+  "datePublished": "{{ project.start_date|date:'Y-m-d' }}",
+  "inLanguage": "en"
+}
+</script>
+{% endblock %}
 
 {% block content %}
 <article class="py-12 md:py-16 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -253,14 +275,16 @@
         </h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {% for img in images %}
-            <figure class="rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden bg-white dark:bg-[#0c1220]">
-              <img src="{{ img.image.url }}" alt="{{ img.caption|default:project.title }}" class="w-full h-56 object-cover" loading="lazy">
-              {% if img.caption %}
-                <figcaption class="p-3 text-xs text-slate-500 font-mono border-t border-slate-100 dark:border-slate-800">
-                  <span class="text-cyan-500 font-semibold">{{ img.get_image_type_display }}:</span> {{ img.caption }}
-                </figcaption>
-              {% endif %}
-            </figure>
+            {% if img.image %}
+              <figure class="rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden bg-white dark:bg-[#0c1220]">
+                <img src="{{ img.image.url }}" alt="{{ img.alt_text|default:img.caption|default:project.title }}" class="w-full h-56 object-cover" loading="lazy">
+                {% if img.caption %}
+                  <figcaption class="p-3 text-xs text-slate-500 font-mono border-t border-slate-100 dark:border-slate-800">
+                    <span class="text-cyan-500 font-semibold">{{ img.get_image_type_display }}:</span> {{ img.caption }}
+                  </figcaption>
+                {% endif %}
+              </figure>
+            {% endif %}
           {% endfor %}
         </div>
       </section>

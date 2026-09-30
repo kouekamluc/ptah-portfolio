@@ -1,6 +1,7 @@
 import datetime
 from django.test import TestCase, Client
 from django.urls import reverse
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.exceptions import ValidationError
 from core.models import Technology, TechnologyCategory
 from .models import Project, ProjectCategory, ProjectMetric, ProjectImage
@@ -112,6 +113,25 @@ class ProjectModelAndViewsTests(TestCase):
         self.assertContains(response, "Balancing Robot")
         self.assertContains(response, "200 Hz")
         self.assertContains(response, "Closed-loop balance rig")
+        self.assertContains(response, "TechArticle")
+
+    def test_project_detail_missing_slug_returns_404(self):
+        response = self.client.get(reverse("projects:detail", kwargs={"slug": "non-existent-slug-404"}))
+        self.assertEqual(response.status_code, 404)
+
+    def test_project_detail_optional_sections_and_gallery(self):
+        # Create image for gallery
+        img = ProjectImage.objects.create(
+            project=self.project,
+            image=SimpleUploadedFile("trace.png", b"fake-png-content", content_type="image/png"),
+            caption="IMU filter frequency response",
+            image_type="plot"
+        )
+        response = self.client.get(reverse("projects:detail", kwargs={"slug": self.project.slug}))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "IMU filter frequency response")
+        # Video URL is empty, so "Video Demonstration" should not be rendered
+        self.assertNotContains(response, "Video Demonstration")
 
     def test_engineering_view(self):
         response = self.client.get(reverse("projects:engineering"))
