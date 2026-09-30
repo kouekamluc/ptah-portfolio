@@ -83,3 +83,34 @@ class CoreViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         # Should display 'Request CV' instead of broken download link
         self.assertContains(response, "Request CV")
+
+    def test_custom_404_view(self):
+        response = self.client.get("/non-existent-endpoint-404-check/")
+        self.assertEqual(response.status_code, 404)
+        self.assertContains(response, "ERROR 404 // SIGNAL LOST", status_code=404)
+
+    def test_sitemap_xml(self):
+        response = self.client.get(reverse("django.contrib.sitemaps.views.sitemap"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "<urlset")
+        self.assertContains(response, "<loc>")
+
+    def test_organization_and_timeline_models(self):
+        import datetime
+        from .models import Organization
+        org = Organization.objects.create(name="KKEVO Tech", role="Founder")
+        self.assertEqual(str(org), "KKEVO Tech (Founder)")
+
+        edu = Education.objects.create(
+            degree="B.Sc. Mechatronics",
+            institution="Polytechnic in Italy",
+            start_date=datetime.date(2023, 10, 1)
+        )
+        self.assertEqual(str(edu), "B.Sc. Mechatronics - Polytechnic in Italy")
+
+        tl = TimelineItem.objects.create(
+            title="Firmware Milestone",
+            organization="Lab",
+            start_date=datetime.date(2024, 3, 1)
+        )
+        self.assertEqual(str(tl), "Firmware Milestone @ Lab")

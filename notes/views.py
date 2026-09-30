@@ -60,6 +60,7 @@ class NoteDetailView(DetailView):
         context["related_notes"] = (
             Note.objects.filter(is_published=True)
             .exclude(id=note.id)
-            .filter(category=note.category)[:3]
+            .filter(category=note.category)
+            .select_related("category")[:3]
         )
         return context

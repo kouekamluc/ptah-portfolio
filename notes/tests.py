@@ -32,3 +32,30 @@ class NoteModelAndViewsTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Discrete PID Implementation")
         self.assertContains(response, "Heading")
+
+    def test_unpublished_note_visibility(self):
+        draft_note = Note.objects.create(
+            title="Draft Engineering Hypothesis",
+            excerpt="Unpublished laboratory measurements",
+            content_markdown="## Confidential\n\nData pending validation.",
+            category=self.category,
+            tags="Confidential, Draft",
+            is_published=False
+        )
+        # Anonymous visitor should get 404
+        res = self.client.get(reverse("notes:detail", kwargs={"slug": draft_note.slug}))
+        self.assertEqual(res.status_code, 404)
+
+        # Staff user can preview draft
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        staff = User.objects.create_user(username="lab_staff", password="pass1234password", is_staff=True)
+        self.client.login(username="lab_staff", password="pass1234password")
+        res_staff = self.client.get(reverse("notes:detail", kwargs={"slug": draft_note.slug}))
+        self.assertEqual(res_staff.status_code, 200)
+        self.assertContains(res_staff, "Draft Engineering Hypothesis")
+
+    def test_note_category_filtering(self):
+        res = self.client.get(reverse("notes:list"), {"category": self.category.slug})
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, "Discrete PID Implementation")

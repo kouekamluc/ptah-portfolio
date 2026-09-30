@@ -77,6 +77,8 @@ class ProjectDetailView(DetailView):
             Project.objects.filter(is_published=True)
             .exclude(id=project.id)
             .filter(Q(category=project.category) | Q(technologies__in=project.technologies.all()))
+            .select_related("category")
+            .prefetch_related("technologies", "metrics")
             .distinct()[:3]
         )
         return context
