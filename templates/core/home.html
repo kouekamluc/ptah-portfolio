@@ -176,46 +176,51 @@
 
 <!-- 2. CURRENTLY BUILDING -->
 {% if currently_building %}
-<section class="py-12 border-y border-slate-200/80 dark:border-slate-800/80 bg-slate-100/50 dark:bg-[#0a0f1d]/50">
+<section id="currently-building" class="py-12 border-y border-slate-200/80 dark:border-slate-800/80 bg-slate-100/50 dark:bg-[#0a0f1d]/50">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between mb-6">
       <div class="flex items-center space-x-2">
         <span class="w-2.5 h-2.5 rounded-full bg-cyan-500 animate-pulse"></span>
         <h2 class="text-xs font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">
-          Currently In The Lab & On The Workbench
+          Currently Building & Active Work
         </h2>
       </div>
-      <span class="text-xs font-mono text-slate-400">Real-time status</span>
+      <span class="text-xs font-mono text-slate-400">Active status</span>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       {% for item in currently_building %}
-        <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0c1220] p-5 shadow-sm">
-          <div class="flex items-center justify-between text-xs mb-2">
-            <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 font-medium">
-              {{ item.category }}
-            </span>
-            <span class="font-mono text-slate-400 text-[11px]">
-              {{ item.status }}
-            </span>
+        <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0c1220] p-5 shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between text-xs mb-2">
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 font-medium">
+                {{ item.category|default:item.get_project_type_display }}
+              </span>
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-mono bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                <span class="w-1.5 h-1.5 rounded-full bg-cyan-500 mr-1.5"></span>
+                {{ item.get_status_display|default:item.status }}
+              </span>
+            </div>
+            <h3 class="font-semibold text-sm text-slate-900 dark:text-slate-100">
+              {% if item.get_absolute_url %}
+                <a href="{{ item.get_absolute_url }}" class="hover:text-cyan-500 transition-colors">
+                  {{ item.title }}
+                </a>
+              {% else %}
+                {{ item.title }}
+              {% endif %}
+            </h3>
+            <p class="mt-1.5 text-xs text-slate-600 dark:text-slate-400 line-clamp-2">
+              {{ item.description }}
+            </p>
           </div>
-          <h3 class="font-semibold text-sm text-slate-900 dark:text-slate-100">
-            {{ item.title }}
-          </h3>
-          <p class="mt-1.5 text-xs text-slate-600 dark:text-slate-400 line-clamp-2">
-            {{ item.description }}
-          </p>
 
-          <!-- Progress indicator -->
-          <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/60">
-            <div class="flex justify-between text-[11px] font-mono text-slate-500 mb-1">
-              <span>Progress</span>
-              <span>{{ item.progress }}%</span>
+          {% if item.next_milestone %}
+            <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/60 text-[11px] font-mono">
+              <span class="text-slate-400">Next Milestone:</span>
+              <span class="text-cyan-600 dark:text-cyan-400 font-medium block truncate">{{ item.next_milestone }}</span>
             </div>
-            <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
-              <div class="bg-cyan-500 h-1.5 rounded-full" style="width: {{ item.progress }}%;"></div>
-            </div>
-          </div>
+          {% endif %}
         </div>
       {% endfor %}
     </div>
@@ -225,6 +230,7 @@
 
 
 <!-- 3. FEATURED PROJECTS -->
+{% if featured_projects %}
 <section id="featured-projects" class="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
   <div class="flex flex-col md:flex-row md:items-end justify-between mb-12">
     <div>
@@ -251,13 +257,10 @@
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     {% for project in featured_projects %}
       {% include 'partials/project_card.html' with project=project %}
-    {% empty %}
-      <div class="col-span-2 text-center py-12 border border-dashed border-slate-300 dark:border-slate-800 rounded-xl text-slate-500">
-        No featured projects designated yet. Mark projects as featured in Django Admin.
-      </div>
     {% endfor %}
   </div>
 </section>
+{% endif %}
 
 
 <!-- 4. DISCIPLINES & AREAS -->

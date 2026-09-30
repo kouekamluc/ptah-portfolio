@@ -3,6 +3,7 @@ from django.urls import reverse
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from .models import SiteSettings, TechnologyCategory, Technology, Education, TimelineItem, SocialLink
+from projects.models import Project, ProjectCategory
 
 
 class CoreModelTests(TestCase):
@@ -203,6 +204,84 @@ class CoreViewTests(TestCase):
         self.assertFalse(s3.active)
         self.assertEqual(s1.icon_identifier, "github")
         self.assertEqual(s2.icon_identifier, "linkedin")
+
+    def test_featured_projects_homepage_section(self):
+        import datetime
+        cat = ProjectCategory.objects.create(name="Mechatronics Section")
+        p_feat = Project.objects.create(
+            title="Featured Quadruped",
+            tagline="Legged locomotion rig",
+            project_type="mechatronics",
+            category=cat,
+            status="prototype",
+            start_date=datetime.date(2024, 1, 1),
+            is_featured=True,
+            is_published=True,
+            overview="Featured robot rig"
+        )
+        p_non_feat = Project.objects.create(
+            title="Hidden Sensor Module",
+            tagline="Low priority bench sensor",
+            project_type="electronics",
+            category=cat,
+            status="completed",
+            start_date=datetime.date(2023, 1, 1),
+            is_featured=False,
+            is_published=True,
+            overview="Non-featured bench sensor"
+        )
+        response = self.client.get(reverse("core:home"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Featured Quadruped")
+        self.assertContains(response, "Featured Engineering & Systems")
+        # In featured section, non-featured project should not appear
+        featured_list = response.context["featured_projects"]
+        self.assertIn(p_feat, featured_list)
+        self.assertNotIn(p_non_feat, featured_list)
+
+    def test_featured_projects_empty_state_hidden(self):
+        Project.objects.all().delete()
+        response = self.client.get(reverse("core:home"))
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, 'id="featured-projects"')
+
+    def test_currently_building_homepage_section(self):
+        import datetime
+        cat = ProjectCategory.objects.create(name="Lab Builds")
+        active_p = Project.objects.create(
+            title="Active IMU Rig",
+            tagline="Kalman filter calibration bench",
+            project_type="mechatronics",
+            category=cat,
+            status="in_development",
+            next_milestone="Bench calibration test",
+            start_date=datetime.date(2025, 1, 1),
+            is_published=True,
+            overview="Active development rig"
+        )
+        completed_p = Project.objects.create(
+            title="Old Completed Motor Driver",
+            tagline="Finished stepper driver",
+            project_type="electronics",
+            category=cat,
+            status="completed",
+            start_date=datetime.date(2022, 1, 1),
+            is_published=True,
+            overview="Completed driver"
+        )
+        response = self.client.get(reverse("core:home"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Active IMU Rig")
+        self.assertContains(response, "Bench calibration test")
+        cb_list = list(response.context["currently_building"])
+        self.assertIn(active_p, cb_list)
+        self.assertNotIn(completed_p, cb_list)
+
+    def test_currently_building_empty_state_hidden(self):
+        Project.objects.all().delete()
+        response = self.client.get(reverse("core:home"))
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, 'id="currently-building"')
 
     def test_custom_404_view(self):
         response = self.client.get("/non-existent-endpoint-404-check/")

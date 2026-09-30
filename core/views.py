@@ -26,7 +26,13 @@ class HomeView(TemplateView):
             .prefetch_related("technologies", "metrics")
             .order_by("display_order", "-start_date")[:4]
         )
-        context["currently_building"] = CurrentlyBuilding.objects.filter(is_active=True).order_by("display_order")[:3]
+        active_statuses = ["planning", "in_development", "prototype", "testing", "concept"]
+        context["currently_building"] = (
+            Project.objects.filter(is_published=True, status__in=active_statuses)
+            .select_related("category")
+            .prefetch_related("technologies")
+            .order_by("display_order", "-start_date")[:3]
+        )
         context["tech_categories"] = (
             TechnologyCategory.objects.prefetch_related("technologies")
             .order_by("display_order")

@@ -231,6 +231,12 @@ class CurrentlyBuilding(models.Model):
         default="In Active Prototyping",
         help_text="e.g. 'Fabricating test rig', 'Writing firmware', 'Drafting control loop'"
     )
+    next_milestone = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        help_text="Next milestone or deliverable"
+    )
     progress = models.PositiveIntegerField(
         default=50,
         help_text="Estimated progress percentage (0 - 100)"

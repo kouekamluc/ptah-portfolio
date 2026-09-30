@@ -91,6 +91,11 @@ class Project(models.Model):
         help_text="Completion date (leave empty if ongoing or maintained)"
     )
     status = models.CharField(max_length=30, choices=STATUS_CHOICES, default="in_development")
+    next_milestone = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Next target milestone or deliverable (e.g. 'Fabricate PCB v2', 'Benchmark latency')"
+    )
     is_featured = models.BooleanField(
         default=False,
         help_text="If checked, prioritized in the homepage showcase"
@@ -166,6 +171,10 @@ class Project(models.Model):
     @short_description.setter
     def short_description(self, value):
         self.tagline = value
+
+    @property
+    def description(self):
+        return self.tagline
 
     @property
     def full_description(self):

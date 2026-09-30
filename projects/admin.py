@@ -69,6 +69,7 @@ class ProjectAdmin(admin.ModelAdmin):
                 "project_type",
                 "category",
                 "status",
+                "next_milestone",
                 "technologies",
                 "display_order",
                 "is_featured",
