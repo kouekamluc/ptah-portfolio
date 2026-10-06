@@ -1,0 +1,94 @@
+<!-- Contact Form Partial (Supports HTMX swap & preservation of field values) -->
+<form 
+  method="post"
+  action="{% url 'contact:index' %}"
+  hx-post="{% url 'contact:index' %}"
+  hx-target="#contact-form-container"
+  hx-indicator="#contact-submit-spinner"
+  class="space-y-4"
+>
+  {% csrf_token %}
+  
+  <!-- Anti-spam Honeypot (Traps automated spam bots) -->
+  {{ form.website }}
+
+  {% if form.non_field_errors %}
+    <div class="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-xs text-rose-700 dark:text-rose-400 font-mono">
+      {% for error in form.non_field_errors %}
+        <p>{{ error }}</p>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div>
+      <label for="{{ form.name.id_for_label }}" class="block text-xs font-mono text-slate-700 dark:text-slate-300 mb-1">
+        Your Name <span class="text-rose-500">*</span>
+      </label>
+      {{ form.name }}
+      {% if form.name.errors %}
+        <p class="text-xs text-rose-500 mt-1 font-mono">{{ form.name.errors.0 }}</p>
+      {% endif %}
+    </div>
+
+    <div>
+      <label for="{{ form.email.id_for_label }}" class="block text-xs font-mono text-slate-700 dark:text-slate-300 mb-1">
+        Email Address <span class="text-rose-500">*</span>
+      </label>
+      {{ form.email }}
+      {% if form.email.errors %}
+        <p class="text-xs text-rose-500 mt-1 font-mono">{{ form.email.errors.0 }}</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <div>
+    <label for="{{ form.organization.id_for_label }}" class="block text-xs font-mono text-slate-700 dark:text-slate-300 mb-1">
+      Organization / Affiliation (optional)
+    </label>
+    {{ form.organization }}
+    {% if form.organization.errors %}
+      <p class="text-xs text-rose-500 mt-1 font-mono">{{ form.organization.errors.0 }}</p>
+    {% endif %}
+  </div>
+
+  <div>
+    <label for="{{ form.subject.id_for_label }}" class="block text-xs font-mono text-slate-700 dark:text-slate-300 mb-1">
+      Subject <span class="text-rose-500">*</span>
+    </label>
+    {{ form.subject }}
+    {% if form.subject.errors %}
+      <p class="text-xs text-rose-500 mt-1 font-mono">{{ form.subject.errors.0 }}</p>
+    {% endif %}
+  </div>
+
+  <div>
+    <label for="{{ form.message.id_for_label }}" class="block text-xs font-mono text-slate-700 dark:text-slate-300 mb-1">
+      Message <span class="text-rose-500">*</span>
+    </label>
+    {{ form.message }}
+    {% if form.message.errors %}
+      <p class="text-xs text-rose-500 mt-1 font-mono">{{ form.message.errors.0 }}</p>
+    {% endif %}
+  </div>
+
+  <div class="pt-2 flex items-center justify-between">
+    <button 
+      type="submit"
+      class="inline-flex items-center px-6 py-2.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white font-medium text-xs font-mono transition-colors shadow"
+    >
+      <span>Transmit Message</span>
+      <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+      </svg>
+    </button>
+
+    <div id="contact-submit-spinner" class="htmx-indicator flex items-center space-x-2 text-cyan-500 text-xs font-mono">
+      <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+      </svg>
+      <span>Sending...</span>
+    </div>
+  </div>
+</form>

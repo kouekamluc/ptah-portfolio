@@ -92,7 +92,7 @@
                 <a href="{{ proto.get_absolute_url }}" class="hover:text-cyan-500 transition-colors">{{ proto.title }}</a>
               </h3>
               <p class="mt-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                {{ proto.short_description }}
+                {{ proto.tagline|default:proto.short_description }}
               </p>
             </div>
             {% if proto.next_milestone %}

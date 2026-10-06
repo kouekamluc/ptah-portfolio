@@ -34,8 +34,8 @@
       <div>
         {% if page_obj.has_previous %}
           <a 
-            href="?page={{ page_obj.previous_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_type %}&type={{ current_type }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}"
-            hx-get="?page={{ page_obj.previous_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_type %}&type={{ current_type }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}"
+            href="?page={{ page_obj.previous_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_type %}&type={{ current_type }}{% endif %}{% if current_status %}&status={{ current_status }}{% endif %}{% if current_tech %}&tech={{ current_tech }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}"
+            hx-get="?page={{ page_obj.previous_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_type %}&type={{ current_type }}{% endif %}{% if current_status %}&status={{ current_status }}{% endif %}{% if current_tech %}&tech={{ current_tech }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}"
             hx-target="#project-grid"
             hx-push-url="true"
             class="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 text-xs font-mono hover:bg-slate-100 dark:hover:bg-slate-800"
@@ -52,8 +52,8 @@
       <div>
         {% if page_obj.has_next %}
           <a 
-            href="?page={{ page_obj.next_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_type %}&type={{ current_type }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}"
-            hx-get="?page={{ page_obj.next_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_type %}&type={{ current_type }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}"
+            href="?page={{ page_obj.next_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_type %}&type={{ current_type }}{% endif %}{% if current_status %}&status={{ current_status }}{% endif %}{% if current_tech %}&tech={{ current_tech }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}"
+            hx-get="?page={{ page_obj.next_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_type %}&type={{ current_type }}{% endif %}{% if current_status %}&status={{ current_status }}{% endif %}{% if current_tech %}&tech={{ current_tech }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}"
             hx-target="#project-grid"
             hx-push-url="true"
             class="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 text-xs font-mono hover:bg-slate-100 dark:hover:bg-slate-800"

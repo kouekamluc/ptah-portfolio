@@ -211,7 +211,7 @@
               {% endif %}
             </h3>
             <p class="mt-1.5 text-xs text-slate-600 dark:text-slate-400 line-clamp-2">
-              {{ item.description }}
+              {{ item.tagline|default:item.description }}
             </p>
           </div>
 

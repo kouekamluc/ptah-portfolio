@@ -45,7 +45,13 @@
     <div class="pt-6 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center text-xs font-mono">
       <div>
         {% if page_obj.has_previous %}
-          <a href="?page={{ page_obj.previous_page_number }}" hx-get="?page={{ page_obj.previous_page_number }}" hx-target="#note-list-container" hx-push-url="true" class="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700">
+          <a 
+            href="?page={{ page_obj.previous_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_tag %}&tag={{ current_tag }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}{% if featured_filter %}&featured={{ featured_filter }}{% endif %}" 
+            hx-get="?page={{ page_obj.previous_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_tag %}&tag={{ current_tag }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}{% if featured_filter %}&featured={{ featured_filter }}{% endif %}" 
+            hx-target="#note-list-container" 
+            hx-push-url="true" 
+            class="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800"
+          >
             &larr; Previous
           </a>
         {% endif %}
@@ -53,7 +59,13 @@
       <span class="text-slate-500">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
       <div>
         {% if page_obj.has_next %}
-          <a href="?page={{ page_obj.next_page_number }}" hx-get="?page={{ page_obj.next_page_number }}" hx-target="#note-list-container" hx-push-url="true" class="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700">
+          <a 
+            href="?page={{ page_obj.next_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_tag %}&tag={{ current_tag }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}{% if featured_filter %}&featured={{ featured_filter }}{% endif %}" 
+            hx-get="?page={{ page_obj.next_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_tag %}&tag={{ current_tag }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}{% if featured_filter %}&featured={{ featured_filter }}{% endif %}" 
+            hx-target="#note-list-container" 
+            hx-push-url="true" 
+            class="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800"
+          >
             Next &rarr;
           </a>
         {% endif %}

@@ -81,8 +81,7 @@ class ContactView(View):
             return redirect("contact:index")
 
         if is_htmx:
-            return render(request, "contact/partials/form_status.html", {
-                "success": False,
+            return render(request, "contact/partials/form.html", {
                 "form": form,
             })
 

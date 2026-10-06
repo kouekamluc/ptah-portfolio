@@ -1,6 +1,6 @@
 <div class="group flex flex-col rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0c1220] hover:border-cyan-500/50 dark:hover:border-cyan-500/50 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
   
-  <!-- Thumbnail (if uploaded) -->
+  <!-- Thumbnail (if uploaded) or Technical Blueprint Placeholder -->
   {% if project.thumbnail %}
     <a href="{{ project.get_absolute_url }}" class="aspect-video w-full overflow-hidden bg-slate-100 dark:bg-slate-800 block border-b border-slate-100 dark:border-slate-800/80">
       <img 
@@ -9,6 +9,26 @@
         loading="lazy" 
         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
       >
+    </a>
+  {% else %}
+    <a href="{{ project.get_absolute_url }}" class="aspect-video w-full overflow-hidden bg-gradient-to-br from-slate-100 via-slate-50 to-slate-200 dark:from-[#0b101c] dark:via-[#0e1628] dark:to-[#131d33] flex flex-col items-center justify-center p-6 border-b border-slate-100 dark:border-slate-800/80 group-hover:opacity-95 transition-opacity relative">
+      <div class="absolute inset-0 bg-tech-grid opacity-50 pointer-events-none"></div>
+      <div class="relative z-10 flex flex-col items-center text-center">
+        <div class="w-10 h-10 rounded-lg bg-white/90 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 flex items-center justify-center mb-2 shadow-sm">
+          {% if project.is_hardware_project %}
+            <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/>
+            </svg>
+          {% else %}
+            <svg class="w-5 h-5 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+            </svg>
+          {% endif %}
+        </div>
+        <span class="text-[10px] font-mono uppercase tracking-widest text-slate-500 dark:text-slate-400 font-semibold">
+          {{ project.get_project_type_display }} &bull; {{ project.year_display }}
+        </span>
+      </div>
     </a>
   {% endif %}
 

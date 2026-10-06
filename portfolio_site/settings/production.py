@@ -40,6 +40,19 @@ if RAILWAY_VOLUME_MOUNT_PATH:
     MEDIA_ROOT = Path(RAILWAY_VOLUME_MOUNT_PATH) / "media"
     MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
 
+# Database check & SSL enforcement for production
+if DATABASES["default"]["ENGINE"] == "django.db.backends.sqlite3":
+    import logging
+    logging.getLogger("django.security").warning(
+        "Production environment is currently using SQLite. "
+        "For multi-worker concurrency and persistent data across deploys, set DATABASE_URL with PostgreSQL."
+    )
+elif DATABASES["default"]["ENGINE"].endswith("postgresql"):
+    db_host = str(DATABASES["default"].get("HOST", "")).lower()
+    is_local_host = db_host in ("localhost", "127.0.0.1", "db", "")
+    if not is_local_host and env.bool("DB_SSL_REQUIRE", default=True):
+        DATABASES["default"].setdefault("OPTIONS", {}).setdefault("sslmode", "require")
+
 # Production Logging Configuration
 LOGGING = {
     "version": 1,

@@ -1,60 +1,66 @@
 <!-- Search Results Partial -->
-<div class="space-y-6">
-  <div class="flex items-center justify-between text-xs font-mono text-slate-500 pb-2 border-b border-slate-100 dark:border-slate-800">
-    <span>Found {{ total_count }} result{{ total_count|pluralize }} for "{{ query }}"</span>
-  </div>
-
-  <!-- Projects Matches -->
-  {% if projects %}
-    <div>
-      <h3 class="text-xs font-mono uppercase tracking-wider text-cyan-600 dark:text-cyan-400 mb-2">Projects ({{ projects|length }})</h3>
-      <ul class="space-y-2">
-        {% for project in projects %}
-          <li>
-            <a href="{{ project.get_absolute_url }}" class="block p-3 rounded-lg border border-slate-100 dark:border-slate-800 hover:border-cyan-500/50 bg-white dark:bg-[#0c1220] transition-colors">
-              <span class="font-semibold text-sm text-slate-900 dark:text-white block">{{ project.title }}</span>
-              <span class="text-xs text-slate-500 line-clamp-1 mt-0.5">{{ project.tagline }}</span>
-            </a>
-          </li>
-        {% endfor %}
-      </ul>
+{% if query %}
+  <div class="space-y-6">
+    <div class="flex items-center justify-between text-xs font-mono text-slate-500 pb-2 border-b border-slate-100 dark:border-slate-800">
+      <span>Found {{ total_count }} result{{ total_count|pluralize }} for "{{ query }}"</span>
     </div>
-  {% endif %}
 
-  <!-- Notes Matches -->
-  {% if notes %}
-    <div>
-      <h3 class="text-xs font-mono uppercase tracking-wider text-cyan-600 dark:text-cyan-400 mb-2">Technical Notes ({{ notes|length }})</h3>
-      <ul class="space-y-2">
-        {% for note in notes %}
-          <li>
-            <a href="{{ note.get_absolute_url }}" class="block p-3 rounded-lg border border-slate-100 dark:border-slate-800 hover:border-cyan-500/50 bg-white dark:bg-[#0c1220] transition-colors">
-              <span class="font-semibold text-sm text-slate-900 dark:text-white block">{{ note.title }}</span>
-              <span class="text-xs text-slate-500 line-clamp-1 mt-0.5">{{ note.excerpt }}</span>
-            </a>
-          </li>
-        {% endfor %}
-      </ul>
-    </div>
-  {% endif %}
-
-  <!-- Technologies Matches -->
-  {% if technologies %}
-    <div>
-      <h3 class="text-xs font-mono uppercase tracking-wider text-cyan-600 dark:text-cyan-400 mb-2">Technologies & Tools ({{ technologies|length }})</h3>
-      <div class="flex flex-wrap gap-2">
-        {% for tech in technologies %}
-          <a href="{% url 'core:stack' %}" class="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0c1220] text-xs font-mono text-slate-800 dark:text-slate-200 hover:border-cyan-500">
-            <span class="font-bold">{{ tech.name }}</span> <span class="text-slate-400">({{ tech.category.name }})</span>
-          </a>
-        {% endfor %}
+    <!-- Projects Matches -->
+    {% if projects %}
+      <div>
+        <h3 class="text-xs font-mono uppercase tracking-wider text-cyan-600 dark:text-cyan-400 mb-2 font-semibold">Projects ({{ projects|length }})</h3>
+        <ul class="space-y-2">
+          {% for project in projects %}
+            <li>
+              <a href="{{ project.get_absolute_url }}" class="block p-3 rounded-lg border border-slate-100 dark:border-slate-800 hover:border-cyan-500/50 bg-white dark:bg-[#0c1220] transition-colors">
+                <span class="font-semibold text-sm text-slate-900 dark:text-white block">{{ project.title }}</span>
+                <span class="text-xs text-slate-500 line-clamp-1 mt-0.5">{{ project.tagline }}</span>
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
       </div>
-    </div>
-  {% endif %}
+    {% endif %}
 
-  {% if not projects and not notes and not technologies %}
-    <div class="text-center py-8 text-xs text-slate-500 font-mono">
-      No items matched your search query. Try another term.
-    </div>
-  {% endif %}
-</div>
+    <!-- Notes Matches -->
+    {% if notes %}
+      <div>
+        <h3 class="text-xs font-mono uppercase tracking-wider text-cyan-600 dark:text-cyan-400 mb-2 font-semibold">Technical Notes ({{ notes|length }})</h3>
+        <ul class="space-y-2">
+          {% for note in notes %}
+            <li>
+              <a href="{{ note.get_absolute_url }}" class="block p-3 rounded-lg border border-slate-100 dark:border-slate-800 hover:border-cyan-500/50 bg-white dark:bg-[#0c1220] transition-colors">
+                <span class="font-semibold text-sm text-slate-900 dark:text-white block">{{ note.title }}</span>
+                <span class="text-xs text-slate-500 line-clamp-1 mt-0.5">{{ note.excerpt }}</span>
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    <!-- Technologies Matches -->
+    {% if technologies %}
+      <div>
+        <h3 class="text-xs font-mono uppercase tracking-wider text-cyan-600 dark:text-cyan-400 mb-2 font-semibold">Technologies & Tools ({{ technologies|length }})</h3>
+        <div class="flex flex-wrap gap-2">
+          {% for tech in technologies %}
+            <a href="{% url 'core:stack' %}" class="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0c1220] text-xs font-mono text-slate-800 dark:text-slate-200 hover:border-cyan-500">
+              <span class="font-bold">{{ tech.name }}</span> <span class="text-slate-400">({{ tech.category.name }})</span>
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    {% if not projects and not notes and not technologies %}
+      <div class="text-center py-8 text-xs text-slate-500 font-mono border border-dashed border-slate-200 dark:border-slate-800 rounded-xl">
+        No items matched your search query "{{ query }}".
+      </div>
+    {% endif %}
+  </div>
+{% else %}
+  <div class="p-6 text-center text-xs font-mono text-slate-500 border border-dashed border-slate-200 dark:border-slate-800 rounded-xl">
+    Type keywords above to search across engineering projects, technical notes, and stack tools.
+  </div>
+{% endif %}

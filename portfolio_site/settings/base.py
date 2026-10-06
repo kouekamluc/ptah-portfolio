@@ -88,8 +88,59 @@ WSGI_APPLICATION = "portfolio_site.wsgi.application"
 ASGI_APPLICATION = "portfolio_site.asgi.application"
 
 # Database Configuration (PostgreSQL in production, SQLite in development)
+# Supports DATABASE_URL (Railway, Supabase, Neon, Render) or discrete POSTGRES_* / DB_* env variables
+database_url = env("DATABASE_URL", default=None)
+if not database_url:
+    postgres_db = env("POSTGRES_DB", default=env("DB_NAME", default=None))
+    if postgres_db:
+        import urllib.parse
+        postgres_user = env("POSTGRES_USER", default=env("DB_USER", default="postgres"))
+        postgres_password = env("POSTGRES_PASSWORD", default=env("DB_PASSWORD", default=""))
+        postgres_host = env("POSTGRES_HOST", default=env("DB_HOST", default="localhost"))
+        postgres_port = env("POSTGRES_PORT", default=env("DB_PORT", default="5432"))
+        encoded_user = urllib.parse.quote_plus(postgres_user)
+        encoded_password = urllib.parse.quote_plus(postgres_password)
+        encoded_db = urllib.parse.quote(postgres_db)
+        database_url = f"postgres://{encoded_user}:{encoded_password}@{postgres_host}:{postgres_port}/{encoded_db}"
+
+if not database_url:
+    database_url = f"sqlite:///{BASE_DIR / 'db.sqlite3'}"
+
+default_db_config = env.db_url_config(database_url)
+
+# Database Connection pooling & Cloud PostgreSQL tuning (Supabase, Railway, Neon, AWS RDS)
+is_postgres = default_db_config.get("ENGINE", "").endswith("postgresql")
+db_host = str(default_db_config.get("HOST", "")).lower()
+db_port = str(default_db_config.get("PORT", ""))
+is_supabase = "supabase" in db_host
+is_pooler = db_port == "6543" or "pooler" in db_host
+
+# For transaction poolers (such as Supabase PgBouncer port 6543), CONN_MAX_AGE must be 0
+if is_pooler:
+    default_conn_max_age = 0
+elif is_postgres:
+    default_conn_max_age = 600
+else:
+    default_conn_max_age = 0
+
+default_db_config["CONN_MAX_AGE"] = env.int("DB_CONN_MAX_AGE", default=default_conn_max_age)
+
+if is_postgres:
+    if "OPTIONS" not in default_db_config:
+        default_db_config["OPTIONS"] = {}
+
+    # Supabase and managed databases require SSL
+    ssl_required = env.bool("DB_SSL_REQUIRE", default=is_supabase)
+    if ssl_required:
+        default_db_config["OPTIONS"].setdefault("sslmode", "require")
+
+    # Supabase Transaction Pooler (port 6543) does not support prepared statements
+    disable_prepared = env.bool("DB_DISABLE_PREPARED_STATEMENTS", default=is_pooler)
+    if disable_prepared:
+        default_db_config["OPTIONS"].setdefault("prepare_threshold", 0)
+
 DATABASES = {
-    "default": env.db("DATABASE_URL", default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}")
+    "default": default_db_config
 }
 
 # Password validation

@@ -1,7 +1,11 @@
 services:
   web:
     build: .
-    command: gunicorn --bind 0.0.0.0:8000 --workers 3 portfolio_site.wsgi:application
+    command: >
+      sh -c "python manage.py wait_for_db &&
+             python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             gunicorn --bind 0.0.0.0:8000 --workers 3 portfolio_site.wsgi:application"
     volumes:
       - static_volume:/app/staticfiles
       - media_volume:/app/media
@@ -14,16 +18,25 @@ services:
       - ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0
       - DATABASE_URL=postgres://portfolio_user:portfolio_password@db:5432/portfolio_db
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
   db:
     image: postgres:16-alpine
+    restart: always
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
       - POSTGRES_DB=portfolio_db
       - POSTGRES_USER=portfolio_user
       - POSTGRES_PASSWORD=portfolio_password
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U portfolio_user -d portfolio_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres_data:

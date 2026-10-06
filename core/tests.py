@@ -624,3 +624,53 @@ class CoreViewTests(TestCase):
             self.assertIn('role="dialog"', content)
             self.assertIn('aria-modal="true"', content)
 
+    def test_wait_for_db_command_success(self):
+        from io import StringIO
+        from django.core.management import call_command
+
+        out = StringIO()
+        call_command("wait_for_db", timeout=2, stdout=out)
+        self.assertIn("Database connection established successfully", out.getvalue())
+
+    def test_wait_for_db_command_retry_and_timeout(self):
+        from unittest.mock import patch
+        from io import StringIO
+        from django.db.utils import OperationalError
+        from django.core.management import call_command
+
+        out = StringIO()
+        err = StringIO()
+        with patch("django.db.backends.base.base.BaseDatabaseWrapper.cursor", side_effect=OperationalError("Connection refused")):
+            with self.assertRaises(SystemExit):
+                call_command("wait_for_db", timeout=1, interval=0.2, stdout=out, stderr=err)
+            self.assertIn("Database connection timed out", err.getvalue())
+
+    def test_postgresql_configuration_parsing(self):
+        import environ
+        import urllib.parse
+        test_env = environ.Env()
+        
+        # Test 1: URL format
+        db_url = "postgres://custom_user:custom_pass@postgres-host:5432/custom_db"
+        cfg1 = test_env.db_url_config(db_url)
+        self.assertEqual(cfg1["ENGINE"], "django.db.backends.postgresql")
+        self.assertEqual(cfg1["NAME"], "custom_db")
+        self.assertEqual(cfg1["USER"], "custom_user")
+        self.assertEqual(cfg1["PASSWORD"], "custom_pass")
+        self.assertEqual(cfg1["HOST"], "postgres-host")
+        self.assertEqual(cfg1["PORT"], 5432)
+
+        # Test 2: Discrete parameters
+        p_db = "portfolio_prod"
+        p_user = "prod_user"
+        p_pass = "secure#pass"
+        p_host = "db.internal"
+        p_port = "5432"
+        constructed = f"postgres://{urllib.parse.quote_plus(p_user)}:{urllib.parse.quote_plus(p_pass)}@{p_host}:{p_port}/{p_db}"
+        cfg2 = test_env.db_url_config(constructed)
+        self.assertEqual(cfg2["ENGINE"], "django.db.backends.postgresql")
+        self.assertEqual(cfg2["NAME"], "portfolio_prod")
+        self.assertEqual(cfg2["USER"], "prod_user")
+        self.assertEqual(cfg2["PASSWORD"], "secure#pass")
+
+
